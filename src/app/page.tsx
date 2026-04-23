@@ -1,8 +1,8 @@
-import Navbar from "./components/Navbar";
+import Navbar from "../components/Navbar";
 import HeroSection from "./components/HeroSection";
 import Collections from "./components/Collections";
 import ProductDisplay from "./components/ProductDisplay";
-import Footer from "./components/Footer";
+import Footer from "../components/Footer";
 
 export default function Home() {
   return (
