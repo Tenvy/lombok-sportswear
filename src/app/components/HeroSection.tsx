@@ -29,9 +29,9 @@ const cards = [
 
 export default function HeroSection() {
   return (
-    <section className="px-4 pb-2 pt-5 lg:px-8">
+    <section className="px-2 pb-2 pt-5 lg:px-8">
       <div className="mx-auto max-w-[1400px]">
-        <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4 lg:gap-3.5">
+        <div className="grid grid-cols-4 gap-1 lg:grid-cols-4 lg:gap-3.5">
           {cards.map((card) => (
             <a
               key={card.id}
@@ -51,7 +51,7 @@ export default function HeroSection() {
         </div>
 
         <div className="py-10 text-center md:py-14">
-          <h1 className="text-3xl font-black uppercase tracking-tight leading-none md:text-5xl lg:text-6xl">
+          <h1 className="text-3xl font-semibold tracking-wide leading-none md:text-8xl lg:text-10xl">
             New Collection 2025
           </h1>
         </div>

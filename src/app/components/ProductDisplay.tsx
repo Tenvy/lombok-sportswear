@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface Product {
   id: string;
@@ -66,53 +67,59 @@ const products: Product[] = [
 ];
 
 function ProductCard({ product }: { product: Product }) {
-  const Wrapper = product.soldOut ? "div" : "a";
-  const wrapperProps = product.soldOut
-    ? { className: "block w-[38vw] flex-shrink-0 cursor-default md:w-[22vw] lg:w-[15vw]" }
-    : {
-        id: product.id,
-        href: product.href,
-        className:
-          "group block w-[38vw] flex-shrink-0 md:w-[22vw] lg:w-[15vw]",
-      };
+  if (product.soldOut) {
+    return (
+      <div className="block w-[38vw] flex-shrink-0 cursor-default md:w-[22vw] lg:w-[15vw]">
+        <div className="group relative aspect-[5/6] overflow-hidden bg-gray-100">
+          <Image
+            src={product.src}
+            alt={product.name}
+            fill
+            sizes="(max-width: 767px) 38vw, (max-width: 1023px) 22vw, 15vw"
+            className="object-cover opacity-60"
+          />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="bg-black px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] text-white">
+              Sold Out
+            </span>
+          </div>
+        </div>
+        <div className="mt-2.5">
+          <p className="truncate text-[11px] font-medium tracking-tight text-gray-300">
+            {product.name}
+          </p>
+          <p className="mt-0.5 text-[11px] text-gray-300 line-through">
+            {product.price}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <Wrapper {...wrapperProps}>
+    <Link
+      id={product.id}
+      href={`/product/${product.id}`}
+      className="group block w-[38vw] flex-shrink-0 md:w-[22vw] lg:w-[15vw]"
+    >
       <div className="group relative aspect-[5/6] overflow-hidden bg-gray-100">
         <Image
           src={product.src}
           alt={product.name}
           fill
           sizes="(max-width: 767px) 38vw, (max-width: 1023px) 22vw, 15vw"
-          className={`object-cover transition-transform duration-300 ${
-            product.soldOut ? "opacity-60" : "group-hover:scale-105"
-          }`}
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
-        {product.soldOut && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="bg-black px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] text-white">
-              Sold Out
-            </span>
-          </div>
-        )}
       </div>
       <div className="mt-2.5">
-        <p
-          className={`truncate text-[11px] font-medium tracking-tight ${
-            product.soldOut ? "text-gray-300" : ""
-          }`}
-        >
+        <p className="truncate text-[11px] font-medium tracking-tight">
           {product.name}
         </p>
-        <p
-          className={`mt-0.5 text-[11px] ${
-            product.soldOut ? "text-gray-300 line-through" : "text-gray-400"
-          }`}
-        >
+        <p className="mt-0.5 text-[11px] text-gray-400">
           {product.price}
         </p>
       </div>
-    </Wrapper>
+    </Link>
   );
 }
 
