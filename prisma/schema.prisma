@@ -4,13 +4,121 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String?
+  phone     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  orders    Order[]
+  addresses Address[]
+}
+
+model Category {
+  id          String           @id @default(cuid())
+  name        String           @unique
+  slug        String           @unique
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  productCategories ProductCategory[]
+}
+
+model ProductCategory {
+  productId   String
+  categoryId  String
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([productId, categoryId])
+}
+
+model Product {
+  id          String            @id @default(cuid())
+  slug        String            @unique
+  name        String
+  description String?
+  price       Int
+  image       String
+  soldOut     Boolean           @default(false)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  orderItems  OrderItem[]
+  productCategories ProductCategory[]
+  sizes       String? // JSON string: ["S", "M", "L", "XL"]
+}
+
+model Address {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  fullName  String
+  phone     String
+  address   String
+  city      String
+  province  String
+  postalCode String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  userId      String?
+  user        User?       @relation(fields: [userId], references: [id])
+  status      OrderStatus @default(PENDING)
+  subtotal    Int
+  shipping    Int         @default(0)
+  total       Int
+  fullName    String
+  phone       String
+  address     String
+  city        String
+  province    String
+  postalCode  String
+  promoCodeId String?
+  promoCode   PromoCode?  @relation(fields: [promoCodeId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  items       OrderItem[]
+}
+
+model OrderItem {
+  id          String   @id @default(cuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id])
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  name        String
+  price       Int
+  quantity    Int
+  size        String
+  image       String
+  createdAt   DateTime @default(now())
+}
+
+model PromoCode {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  discount    Int      // percentage
+  maxUsage    Int?
+  usedCount   Int      @default(0)
+  expiresAt   DateTime?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  orders      Order[]
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }

@@ -4,12 +4,14 @@ import { useState } from "react";
 import { Search, ShoppingBag, Menu, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useCart } from "@/src/app/context/CartContext";
 import MobileNavbar from "./MobileNavbar";
 import SearchNavbar from "./SearchNavbar";
 
 export default function Navbar() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const { totalItems } = useCart();
 
   return (
     <>
@@ -63,9 +65,11 @@ export default function Navbar() {
               className="relative transition-colors hover:text-gray-400"
             >
               <ShoppingBag className="size-[18px]" />
-              <span className="absolute -right-1.5 -top-1.5 flex size-3.5 items-center justify-center rounded-full bg-black text-[8px] font-bold text-white">
-                2
-              </span>
+              {totalItems > 0 && (
+                <span className="absolute -right-1.5 -top-1.5 flex size-3.5 items-center justify-center rounded-full bg-black text-[8px] font-bold text-white">
+                  {totalItems}
+                </span>
+              )}
             </Link>
             <Link
               id="nav-user-link"

@@ -1,4 +1,8 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 interface CollectionCardProps {
@@ -23,7 +27,7 @@ function CollectionCard({
   labelSize,
 }: CollectionCardProps) {
   return (
-    <a
+    <Link
       id={id}
       href={href}
       className="collection-card group relative block overflow-hidden bg-gray-100"
@@ -51,74 +55,62 @@ function CollectionCard({
           </div>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }
 
-const collections: CollectionCardProps[] = [
-  {
-    id: "collection-men-link",
-    href: "/collections/men",
-    src: "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=800&h=1000&fit=crop",
-    alt: "Men Collection",
-    count: "42 Produk",
-    label: "Men",
-    aspect: "aspect-[4/5]",
-    labelSize: "text-2xl lg:text-3xl",
-  },
-  {
-    id: "collection-women-link",
-    href: "/collections/women",
-    src: "https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=800&h=1000&fit=crop",
-    alt: "Women Collection",
-    count: "38 Produk",
-    label: "Women",
-    aspect: "aspect-[4/5]",
-    labelSize: "text-2xl lg:text-3xl",
-  },
-  {
-    id: "collection-men-tops-link",
-    href: "/collections/men-tops",
-    src: "https://images.unsplash.com/photo-1621072156002-e2fccdc0b176?w=900&h=560&fit=crop",
-    alt: "Men Tops",
-    count: "24 Produk",
-    label: "Men Tops",
-    aspect: "aspect-[4/5]",
-    labelSize: "text-xl lg:text-2xl",
-  },
-  {
-    id: "collection-women-tops-link",
-    href: "/collections/women-tops",
-    src: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=900&h=560&fit=crop",
-    alt: "Women Tops",
-    count: "18 Produk",
-    label: "Women Tops",
-    aspect: "aspect-[16/10]",
-    labelSize: "text-xl lg:text-2xl",
-  },
-  {
-    id: "collection-accessories-link",
-    href: "/collections/accessories",
-    src: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=900&h=560&fit=crop",
-    alt: "Accessories",
-    count: "12 Produk",
-    label: "Accessories",
-    aspect: "aspect-[16/10]",
-    labelSize: "text-xl lg:text-2xl",
-  },
-  {
-    id: "collection-outerwear-link",
-    href: "/collections/outerwear",
-    src: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=900&h=560&fit=crop",
-    alt: "Outerwear",
-    count: "16 Produk",
-    label: "Outerwear",
-    aspect: "aspect-[16/10]",
-    labelSize: "text-xl lg:text-2xl",
-  },
-];
-
 export default function CollectionsGrid() {
+  const [collections, setCollections] = useState<CollectionCardProps[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchCollections() {
+      try {
+        const response = await fetch("/api/categories");
+        if (!response.ok) throw new Error("Failed to fetch categories");
+        const data = await response.json();
+
+        const collectionImages: Record<string, string> = {
+          men: "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=800&h=1000&fit=crop",
+          women: "https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=800&h=1000&fit=crop",
+          accessories: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=900&h=560&fit=crop",
+          "new-in": "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=1000&fit=crop",
+          sale: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=900&h=560&fit=crop",
+        };
+
+        const mappedCollections = data.map((cat: any, index: number) => ({
+          id: `collection-${cat.slug}-link`,
+          href: `/collections/${cat.slug}`,
+          src: collectionImages[cat.slug] || "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=900&h=560&fit=crop",
+          alt: `${cat.name} Collection`,
+          count: `${cat._count?.productCategories || 0} Produk`,
+          label: cat.name,
+          aspect: index < 2 ? "aspect-[4/5]" as const : "aspect-[16/10]" as const,
+          labelSize: index < 2 ? "text-2xl lg:text-3xl" as const : "text-xl lg:text-2xl" as const,
+        }));
+
+        setCollections(mappedCollections);
+      } catch (error) {
+        console.error("Error fetching collections:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchCollections();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="bg-white pb-20 lg:pb-28">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="flex items-center justify-center py-20">
+            <div className="animate-pulse text-gray-400">Loading collections...</div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="bg-white pb-20 lg:pb-28">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

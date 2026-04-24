@@ -2,6 +2,7 @@
 
 import { Search, X, ShoppingBag, User } from "lucide-react";
 import Image from "next/image";
+import { useCart } from "@/src/app/context/CartContext";
 
 interface MobileNavbarProps {
   isOpen: boolean;
@@ -10,12 +11,13 @@ interface MobileNavbarProps {
 }
 
 const navLinks = [
-  { label: "Men", href: "#men" },
-  { label: "Women", href: "#women" },
-  { label: "Collections", href: "#collections" },
+  { label: "Men", href: "/#men" },
+  { label: "Women", href: "/#women" },
+  { label: "Collections", href: "/#collections" },
 ];
 
 export default function MobileNavbar({ isOpen, onClose, onSearchClick }: MobileNavbarProps) {
+  const { totalItems } = useCart();
   return (
     <nav
       className={`bg-white z-50 fixed bottom-0 left-0 h-full max-w-full shadow-xl transition-transform duration-300 ${
@@ -70,14 +72,16 @@ export default function MobileNavbar({ isOpen, onClose, onSearchClick }: MobileN
               <Search className="size-[18px]" />
             </button>
             <a
-              href="#"
+              href="/cart"
               className="relative transition-colors hover:text-gray-400"
               onClick={onClose}
             >
               <ShoppingBag className="size-[18px]" />
-              <span className="absolute -right-1.5 -top-1.5 flex size-3.5 items-center justify-center rounded-full bg-black text-[8px] font-bold text-white">
-                0
-              </span>
+              {totalItems > 0 && (
+                <span className="absolute -right-1.5 -top-1.5 flex size-3.5 items-center justify-center rounded-full bg-black text-[8px] font-bold text-white">
+                  {totalItems}
+                </span>
+              )}
             </a>
             <a
               href="#"

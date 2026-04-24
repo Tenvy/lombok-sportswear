@@ -7,6 +7,8 @@ export const metadata: Metadata = {
     "Engineered sportswear for the modern athlete. Minimal design, maximum performance.",
 };
 
+import { Providers } from "./providers";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -24,7 +26,9 @@ export default function RootLayout({
           async
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
