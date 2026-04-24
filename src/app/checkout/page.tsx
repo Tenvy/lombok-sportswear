@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ChevronRight, Check, Tag } from "lucide-react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import Navbar from "@/src/components/Navbar";
+import Footer from "@/src/components/Footer";
 import Link from "next/link";
 
 const checkoutItems = [

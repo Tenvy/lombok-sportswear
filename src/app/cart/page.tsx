@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Trash2, Minus, Plus, ArrowRight, Tag, ChevronRight } from "lucide-react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import Navbar from "@/src/components/Navbar";
+import Footer from "@/src/components/Footer";
 import Link from "next/link";
 
 const initialCartItems = [

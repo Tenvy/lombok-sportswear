@@ -4,8 +4,8 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import { useState } from "react";
 import { Heart, Share2, ChevronRight, Minus, Plus, ShoppingBag, Star } from "lucide-react";
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
+import Navbar from "@/src/components/Navbar";
+import Footer from "@/src/components/Footer";
 
 // Mock data for products
 const productsData = {
