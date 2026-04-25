@@ -85,8 +85,8 @@ export default function CollectionsGrid() {
           alt: `${cat.name} Collection`,
           count: `${cat._count?.productCategories || 0} Produk`,
           label: cat.name,
-          aspect: index < 2 ? "aspect-[4/5]" as const : "aspect-[16/10]" as const,
-          labelSize: index < 2 ? "text-2xl lg:text-3xl" as const : "text-xl lg:text-2xl" as const,
+          aspect: index < 3 ? "aspect-[4/5]" as const : "aspect-[16/10]" as const,
+          labelSize: index < 3 ? "text-2xl lg:text-3xl" as const : "text-xl lg:text-2xl" as const,
         }));
 
         setCollections(mappedCollections);
