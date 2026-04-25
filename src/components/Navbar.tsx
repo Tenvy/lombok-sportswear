@@ -26,21 +26,21 @@ export default function Navbar() {
           <div className="hidden items-center gap-7 md:flex">
             <Link
               id="nav-men-link"
-              href="/#men"
+              href="/collections/men"
               className="text-[11px] font-semibold uppercase tracking-[0.18em] transition-colors hover:text-gray-400"
             >
               Men
             </Link>
             <Link
               id="nav-women-link"
-              href="/#women"
+              href="/collections/women"
               className="text-[11px] font-semibold uppercase tracking-[0.18em] transition-colors hover:text-gray-400"
             >
               Women
             </Link>
             <Link
               id="nav-collections-link"
-              href="/#collections"
+              href="/collections"
               className="text-[11px] font-semibold uppercase tracking-[0.18em] transition-colors hover:text-gray-400"
             >
               Collections
