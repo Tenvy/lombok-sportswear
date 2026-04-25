@@ -45,6 +45,7 @@ model Product {
   description String?
   price       Int
   image       String
+  images      String? // JSON string array: ["url1", "url2"]
   soldOut     Boolean           @default(false)
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt

@@ -7,6 +7,7 @@ import Navbar from "@/src/components/Navbar";
 import Footer from "@/src/components/Footer";
 import Link from "next/link";
 import { useCart } from "@/src/app/context/CartContext";
+import { useOrderStore } from "@/src/store/useOrderStore";
 
 interface CheckoutItem {
   id: string;
@@ -23,7 +24,6 @@ export default function CheckoutPage() {
   const [promoCode, setPromoCode] = useState("");
   const [promoValid, setPromoValid] = useState<boolean | null>(null);
   const [promoDiscount, setPromoDiscount] = useState(0);
-  const [loading, setLoading] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState({
@@ -51,21 +51,16 @@ export default function CheckoutPage() {
     return Object.keys(errors).length === 0;
   };
 
+  const { validatePromo, createOrder, loading } = useOrderStore();
+
   const checkPromoCode = async () => {
     if (!promoCode.trim()) return;
 
-    try {
-      const response = await fetch(`/api/promo/${encodeURIComponent(promoCode)}`);
-      const data = await response.json();
-
-      if (data.valid) {
-        setPromoValid(true);
-        setPromoDiscount(data.discount);
-      } else {
-        setPromoValid(false);
-        setPromoDiscount(0);
-      }
-    } catch (error) {
+    const result = await validatePromo(promoCode);
+    if (result?.valid) {
+      setPromoValid(true);
+      setPromoDiscount(result.discount || 0);
+    } else {
       setPromoValid(false);
       setPromoDiscount(0);
     }
@@ -74,46 +69,28 @@ export default function CheckoutPage() {
   const handleSubmitOrder = async () => {
     if (!validateForm()) return;
 
-    setLoading(true);
+    const orderData = {
+      items: cart.map((item) => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        size: item.size,
+        image: item.image,
+        customization: item.customization,
+      })),
+      ...formData,
+      promoCode: promoValid ? promoCode : undefined,
+    };
 
-    try {
-      const orderData = {
-        items: cart.map((item) => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          size: item.size,
-          image: item.image,
-          customization: item.customization,
-        })),
-        ...formData,
-        promoCode: promoValid ? promoCode : undefined,
-      };
+    const order = await createOrder(orderData);
 
-      const response = await fetch("/api/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(orderData),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to create order");
-      }
-
-      const order = await response.json();
-
+    if (order) {
       clearCart();
-
       alert(`Order berhasil dibuat! Order ID: ${order.id}`);
       window.location.href = "/";
-    } catch (error: any) {
-      alert(error.message || "Terjadi kesalahan saat membuat order");
-    } finally {
-      setLoading(false);
+    } else {
+      alert("Terjadi kesalahan saat membuat order");
     }
   };
 

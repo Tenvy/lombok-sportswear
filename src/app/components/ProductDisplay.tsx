@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useProductStore } from "@/src/store/useProductStore";
 
 interface Product {
   id: string;
@@ -73,24 +74,11 @@ function ProductCard({ product }: { product: Product }) {
 
 export default function ProductDisplay() {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { products, loading, fetchProducts } = useProductStore();
 
   useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const response = await fetch("/api/products?category=men");
-        if (!response.ok) throw new Error("Failed to fetch products");
-        const data = await response.json();
-        setProducts(data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchProducts();
-  }, []);
+    fetchProducts("category=men");
+  }, [fetchProducts]);
 
   if (loading) {
     return (

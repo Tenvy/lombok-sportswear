@@ -7,6 +7,7 @@ import { Heart, Share2, ChevronRight, Minus, Plus, ShoppingBag, Star } from "luc
 import Navbar from "@/src/components/Navbar";
 import Footer from "@/src/components/Footer";
 import { useCart } from "@/src/app/context/CartContext";
+import { useProductStore } from "@/src/store/useProductStore";
 import Link from "next/link";
 
 interface Product {
@@ -16,6 +17,7 @@ interface Product {
   description: string;
   price: number;
   image: string;
+  images: string[];
   soldOut: boolean;
   sizes: string[];
   categories: Array<{
@@ -42,32 +44,24 @@ const colors = [
 export default function ProductPage() {
   const params = useParams();
   const productSlug = params.slug as string;
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { product, loading, fetchProduct } = useProductStore();
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState(colors[0].name);
   const [quantity, setQuantity] = useState(1);
   const [selectedService, setSelectedService] = useState<{ name: string; price: number } | null>(null);
+  const [descExpanded, setDescExpanded] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { addToCart } = useCart();
 
   useEffect(() => {
-    async function fetchProduct() {
-      try {
-        const response = await fetch(`/api/products/${productSlug}`);
-        if (!response.ok) throw new Error("Failed to fetch product");
-        const data = await response.json();
-        setProduct(data);
-        if (data.sizes && data.sizes.length > 0) {
-          setSelectedSize(data.sizes[0]);
-        }
-      } catch (error) {
-        console.error("Error fetching product:", error);
-      } finally {
-        setLoading(false);
-      }
+    fetchProduct(productSlug);
+  }, [productSlug, fetchProduct]);
+
+  useEffect(() => {
+    if (product?.sizes && product.sizes.length > 0) {
+      setSelectedSize(product.sizes[0]);
     }
-    fetchProduct();
-  }, [productSlug]);
+  }, [product]);
 
   const handleAddToCart = () => {
     if (!product || !selectedSize) return;
@@ -137,8 +131,8 @@ export default function ProductPage() {
             <div className="sticky top-24 space-y-4">
               <div className="relative aspect-[3/4] overflow-hidden bg-gray-50">
                 <Image
-                  src={product.image}
-                  alt={product.name}
+                  src={product.images?.[selectedImageIndex] || product.image}
+                  alt={`${product.name} - ${selectedImageIndex + 1}`}
                   fill
                   className="object-cover"
                   priority
@@ -151,6 +145,26 @@ export default function ProductPage() {
                   </div>
                 )}
               </div>
+              {product.images && product.images.length > 1 && (
+                <div className="flex gap-3 overflow-x-auto pb-1">
+                  {product.images.map((img, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImageIndex(index)}
+                      className={`relative size-20 shrink-0 overflow-hidden border-2 transition-all ${
+                        selectedImageIndex === index ? "border-black" : "border-gray-200 hover:border-gray-400"
+                      }`}
+                    >
+                      <Image
+                        src={img}
+                        alt={`${product.name} thumbnail ${index + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -172,10 +186,6 @@ export default function ProductPage() {
                   )}
                 </div>
               </div>
-
-              <p className="text-sm leading-relaxed text-gray-500">
-                {product.description}
-              </p>
 
               <div className="h-px bg-gray-100" />
 
@@ -294,12 +304,34 @@ export default function ProductPage() {
                   <button className="flex flex-1 items-center justify-center border border-gray-200 h-14 hover:border-black transition-colors">
                     <Share2 className="size-5" />
                   </button>
+                 </div>
+               </div>
+
+              <div className="h-px bg-gray-100" />
+
+              {/* Description */}
+              <div className="mt-4">
+                <div className={`relative overflow-hidden transition-[max-height] duration-300 ${descExpanded ? "max-h-[9999px]" : "max-h-[344px]"}`}>
+                  <p className="whitespace-pre-line text-sm leading-relaxed text-gray-500">
+                    {product.description}
+                  </p>
+                  {!descExpanded && (
+                    <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-white to-transparent" />
+                  )}
                 </div>
+                {!descExpanded && (
+                  <button
+                    onClick={() => setDescExpanded(true)}
+                    className="mt-2 flex w-full items-center justify-center rounded border border-gray-200 bg-white px-4 py-2.5 text-xs font-semibold text-gray-600 transition-colors hover:border-black hover:text-black"
+                  >
+                    Lihat Selengkapnya
+                  </button>
+                )}
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
+             </div>
+           </div>
+         </div>
+       </div>
 
       <Footer />
     </main>

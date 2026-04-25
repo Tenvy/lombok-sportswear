@@ -34,6 +34,7 @@ export async function GET(
     return NextResponse.json({
       ...product,
       sizes: product.sizes ? JSON.parse(product.sizes) : [],
+      images: product.images ? JSON.parse(product.images) : [product.image],
       categories: product.productCategories.map((pc) => pc.category),
     });
   } catch (error) {

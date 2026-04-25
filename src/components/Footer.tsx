@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Image from "next/image";
 import { MdiInstagram } from "@/src/icons/instagram";
 import { IcBaselineTiktok } from "@/src/icons/tiktok";
@@ -7,7 +8,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-gray-100 px-4 pb-10 pt-14 lg:px-8">
       <div className="mx-auto max-w-[1400px]">
-        <div className="mb-14 grid grid-cols-2 gap-10 md:grid-cols-4 md:gap-8">
+        <div className="mb-14 grid grid-cols-2 gap-10 md:grid-cols-6 md:gap-8">
           <div className="col-span-2 md:col-span-1">
             <Image
               src="https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/brand-assets/heymale.id/logo-1776918650555.webp"
@@ -78,61 +79,78 @@ export default function Footer() {
 
           <div>
             <h4 className="mb-5 text-[10px] font-bold uppercase tracking-[0.2em]">
-              Support
+              Story
             </h4>
             <ul className="space-y-3">
               <li>
-                <a
-                  id="f-faq-link"
-                  href="#"
+                <Link
+                  id="f-about-link"
+                  href="/about"
                   className="text-[10px] uppercase tracking-[0.1em] text-gray-400 transition-colors hover:text-black"
                 >
-                  FAQ
-                </a>
+                  About Us
+                </Link>
               </li>
               <li>
-                <a
-                  id="f-ship-link"
-                  href="#"
+                <Link
+                  id="f-contact-link"
+                  href="/contact"
                   className="text-[10px] uppercase tracking-[0.1em] text-gray-400 transition-colors hover:text-black"
                 >
-                  Shipping
-                </a>
-              </li>
-              <li>
-                <a
-                  id="f-ret-link"
-                  href="#"
-                  className="text-[10px] uppercase tracking-[0.1em] text-gray-400 transition-colors hover:text-black"
-                >
-                  Returns
-                </a>
+                  Contact
+                </Link>
               </li>
             </ul>
           </div>
 
           <div>
             <h4 className="mb-5 text-[10px] font-bold uppercase tracking-[0.2em]">
-              Story
+              Support
             </h4>
             <ul className="space-y-3">
               <li>
-                <a
-                  id="f-about-link"
-                  href="#"
+                <Link
+                  id="f-ship-link"
+                  href="/shipping-policy"
                   className="text-[10px] uppercase tracking-[0.1em] text-gray-400 transition-colors hover:text-black"
                 >
-                  About Us
-                </a>
+                  Shipping
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="mb-5 text-[10px] font-bold uppercase tracking-[0.2em]">
+              Legal
+            </h4>
+            <ul className="space-y-3">
+              <li>
+                <Link
+                  id="f-privacy-link"
+                  href="/privacy-policy"
+                  className="text-[10px] uppercase tracking-[0.1em] text-gray-400 transition-colors hover:text-black"
+                >
+                  Privacy Policy
+                </Link>
               </li>
               <li>
-                <a
-                  id="f-contact-link"
-                  href="#"
+                <Link
+                  id="f-terms-link"
+                  href="/terms-and-condition"
                   className="text-[10px] uppercase tracking-[0.1em] text-gray-400 transition-colors hover:text-black"
                 >
-                  Contact
-                </a>
+                  Terms &amp; Conditions
+                </Link>
+              </li>
+              <li>
+                <Link
+                  id="f-refund-link"
+                  href="/refund-policy"
+                  className="text-[10px] uppercase tracking-[0.1em] text-gray-400 transition-colors hover:text-black"
+                >
+                  Refund Policy
+                </Link>
               </li>
             </ul>
           </div>

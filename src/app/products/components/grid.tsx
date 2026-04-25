@@ -11,6 +11,7 @@ import {
   SlidersHorizontal,
   ChevronDown,
 } from "lucide-react";
+import { useProductStore } from "@/src/store/useProductStore";
 
 interface Product {
   id: string;
@@ -459,18 +460,18 @@ function ProductCard({
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         {!product.soldOut && (
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onQuickAdd(product);
-            }}
-            className="absolute inset-0 flex items-end justify-center bg-black/10 pb-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-          >
-            <span className="bg-white px-6 py-2.5 text-xs font-semibold uppercase tracking-widest text-black">
+          <div className="pointer-events-none absolute inset-0 flex items-end justify-center bg-black/10 pb-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onQuickAdd(product);
+              }}
+              className="pointer-events-auto bg-white px-6 py-2.5 text-xs font-semibold uppercase tracking-widest text-black"
+            >
               Quick Add
-            </span>
-          </button>
+            </button>
+          </div>
         )}
         {product.soldOut && (
           <span className="absolute left-3 top-3 bg-black px-3 py-1.5 text-[10px] font-medium uppercase tracking-widest text-white">
@@ -494,26 +495,13 @@ function ProductCard({
 }
 
 export default function ProductsGrid() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { products, loading, fetchProducts } = useProductStore();
   const [quickAddProduct, setQuickAddProduct] = useState<Product | null>(null);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
   useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const response = await fetch("/api/products?soldOut=false");
-        if (!response.ok) throw new Error("Failed to fetch products");
-        const data = await response.json();
-        setProducts(data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchProducts();
-  }, []);
+    fetchProducts("soldOut=false");
+  }, [fetchProducts]);
 
   const handleQuickAdd = useCallback((product: Product) => {
     setQuickAddProduct(product);

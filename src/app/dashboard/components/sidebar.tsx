@@ -1,4 +1,8 @@
+"use client";
+
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Package,
@@ -17,32 +21,24 @@ interface SidebarLink {
   icon: React.ReactNode;
   label: string;
   badge?: number;
-  active?: boolean;
 }
 
 const mainLinks: SidebarLink[] = [
   {
     id: "sidebar-dashboard",
-    href: "#",
+    href: "/dashboard",
     icon: <LayoutDashboard className="text-base" />,
     label: "Dashboard",
-    active: true,
   },
   {
     id: "sidebar-products",
-    href: "#",
+    href: "/dashboard/products",
     icon: <Package className="text-base" />,
     label: "Products",
   },
   {
-    id: "sidebar-content",
-    href: "#",
-    icon: <FileText className="text-base" />,
-    label: "Content",
-  },
-  {
     id: "sidebar-orders",
-    href: "#",
+    href: "/dashboard/orders",
     icon: <ShoppingCart className="text-base" />,
     label: "Orders",
     badge: 5,
@@ -52,19 +48,19 @@ const mainLinks: SidebarLink[] = [
 const managementLinks: SidebarLink[] = [
   {
     id: "sidebar-customers",
-    href: "#",
+    href: "/dashboard/customers",
     icon: <Users className="text-base" />,
     label: "Customers",
   },
   {
     id: "sidebar-analytics",
-    href: "#",
+    href: "/dashboard/analytics",
     icon: <BarChart3 className="text-base" />,
     label: "Analytics",
   },
   {
     id: "sidebar-pos",
-    href: "#",
+    href: "/dashboard/pos",
     icon: <Monitor className="text-base" />,
     label: "Point of Sale",
   },
@@ -73,7 +69,7 @@ const managementLinks: SidebarLink[] = [
 const systemLinks: SidebarLink[] = [
   {
     id: "sidebar-settings",
-    href: "#",
+    href: "/dashboard/settings",
     icon: <Settings className="text-base" />,
     label: "Settings",
   },
@@ -82,40 +78,44 @@ const systemLinks: SidebarLink[] = [
 function SidebarSection({
   title,
   links,
+  pathname,
 }: {
   title: string;
   links: SidebarLink[];
+  pathname: string;
 }) {
   return (
     <>
-      <p className="px-3 pb-2 pt-5 text-[9px] font-bold uppercase tracking-[0.2em] text-gray-400">
-        {title}
-      </p>
-      {links.map((link) => (
-        <a
-          key={link.id}
-          id={link.id}
-          href={link.href}
-          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] transition-colors ${
-            link.active
-              ? "bg-gray-100 font-semibold text-black"
-              : "text-gray-500 hover:bg-gray-50 hover:text-black"
-          }`}
-        >
-          {link.icon}
-          {link.label}
-          {link.badge !== undefined && (
-            <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-black text-[10px] font-semibold text-white">
-              {link.badge}
-            </span>
-          )}
-        </a>
-      ))}
+      {links.map((link) => {
+        const isActive = pathname === link.href;
+        return (
+          <Link
+            key={link.id}
+            id={link.id}
+            href={link.href}
+            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] transition-colors ${
+              isActive
+                ? "bg-gray-100 font-semibold text-black"
+                : "text-gray-500 hover:bg-gray-50 hover:text-black"
+            }`}
+          >
+            {link.icon}
+            {link.label}
+            {link.badge !== undefined && (
+              <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-black text-[10px] font-semibold text-white">
+                {link.badge}
+              </span>
+            )}
+          </Link>
+        );
+      })}
     </>
   );
 }
 
 export default function DashboardSidebar() {
+  const pathname = usePathname();
+
   return (
     <aside className="sticky top-0 flex h-screen w-[240px] flex-shrink-0 flex-col border-r border-gray-200 bg-white">
       <div className="flex h-16 items-center border-b border-gray-100 px-6">
@@ -131,10 +131,10 @@ export default function DashboardSidebar() {
         </span>
       </div>
 
-      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
-        <SidebarSection title="Main" links={mainLinks} />
-        <SidebarSection title="Management" links={managementLinks} />
-        <SidebarSection title="System" links={systemLinks} />
+      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 pb-4 pt-2">
+        <SidebarSection title="Main" links={mainLinks} pathname={pathname} />
+        <SidebarSection title="Management" links={managementLinks} pathname={pathname} />
+        <SidebarSection title="System" links={systemLinks} pathname={pathname} />
       </nav>
 
       <div className="flex items-center gap-3 border-t border-gray-100 px-4 py-3">

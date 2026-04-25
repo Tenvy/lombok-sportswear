@@ -2,12 +2,13 @@
 
 import { useState, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ChevronLeft, ChevronRight, X, ShoppingBag, SlidersHorizontal, ChevronDown } from "lucide-react";
 import MobileFilter from "../../components/MobileFilter";
 
 interface Product {
   id: string;
-  href: string;
+  slug: string;
   image: string;
   name: string;
   category: string;
@@ -18,7 +19,7 @@ interface Product {
 const products: Product[] = [
   {
     id: "p1",
-    href: "#",
+    slug: "training-crew-tee",
     image: "https://images.unsplash.com/photo-1621072156002-e2fccdc0b176?w=500&h=660&fit=crop",
     name: "Training Crew Tee",
     category: "T-Shirt",
@@ -27,7 +28,7 @@ const products: Product[] = [
   },
   {
     id: "p2",
-    href: "#",
+    slug: "lombok-classic-polo",
     image: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=500&h=660&fit=crop",
     name: "Lombok Classic Polo",
     category: "Polo",
@@ -36,7 +37,7 @@ const products: Product[] = [
   },
   {
     id: "p3",
-    href: "#",
+    slug: "essential-hoodie-black",
     image: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=500&h=660&fit=crop",
     name: "Essential Hoodie Black",
     category: "Hoodie",
@@ -44,7 +45,7 @@ const products: Product[] = [
   },
   {
     id: "p4",
-    href: "#",
+    slug: "sport-zip-jacket",
     image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&h=660&fit=crop",
     name: "Sport Zip Jacket",
     category: "Jacket",
@@ -53,7 +54,7 @@ const products: Product[] = [
   },
   {
     id: "p5",
-    href: "#",
+    slug: "wide-leg-trousers",
     image: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=500&h=660&fit=crop",
     name: "Wide Leg Trousers",
     category: "Pants",
@@ -61,7 +62,7 @@ const products: Product[] = [
   },
   {
     id: "p6",
-    href: "#",
+    slug: "zip-hoodie-essential",
     image: "https://images.unsplash.com/photo-1434389677669-e08b4cda3a0a?w=500&h=660&fit=crop",
     name: "Zip Hoodie Essential",
     category: "Hoodie",
@@ -70,7 +71,7 @@ const products: Product[] = [
   },
   {
     id: "p7",
-    href: "#",
+    slug: "slim-jogger-pants",
     image: "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=500&h=660&fit=crop",
     name: "Slim Jogger Pants",
     category: "Pants",
@@ -78,7 +79,7 @@ const products: Product[] = [
   },
   {
     id: "p8",
-    href: "#",
+    slug: "track-jacket-pro",
     image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=500&h=660&fit=crop",
     name: "Track Jacket Pro",
     category: "Jacket",
@@ -87,7 +88,7 @@ const products: Product[] = [
   },
   {
     id: "p9",
-    href: "#",
+    slug: "everyday-crewneck",
     image: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=500&h=660&fit=crop",
     name: "Everyday Crewneck",
     category: "T-Shirt",
@@ -96,7 +97,7 @@ const products: Product[] = [
   },
   {
     id: "p10",
-    href: "#",
+    slug: "stripe-polo-relaxed",
     image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&h=660&fit=crop",
     name: "Stripe Polo Relaxed",
     category: "Polo",
@@ -104,7 +105,7 @@ const products: Product[] = [
   },
   {
     id: "p11",
-    href: "#",
+    slug: "pullover-hoodie",
     image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&h=660&fit=crop",
     name: "Pullover Hoodie",
     category: "Hoodie",
@@ -112,7 +113,7 @@ const products: Product[] = [
   },
   {
     id: "p12",
-    href: "#",
+    slug: "bomber-jacket-urban",
     image: "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=500&h=660&fit=crop",
     name: "Bomber Jacket Urban",
     category: "Jacket",
@@ -121,7 +122,7 @@ const products: Product[] = [
   },
   {
     id: "p13",
-    href: "#",
+    slug: "graphic-tee-bold",
     image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500&h=660&fit=crop",
     name: "Graphic Tee Bold",
     category: "T-Shirt",
@@ -129,7 +130,7 @@ const products: Product[] = [
   },
   {
     id: "p14",
-    href: "#",
+    slug: "oxford-polo-smart",
     image: "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=500&h=660&fit=crop",
     name: "Oxford Polo Smart",
     category: "Polo",
@@ -137,7 +138,7 @@ const products: Product[] = [
   },
   {
     id: "p15",
-    href: "#",
+    slug: "oversized-tee-minimal",
     image: "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=500&h=660&fit=crop",
     name: "Oversized Tee Minimal",
     category: "T-Shirt",
@@ -146,7 +147,7 @@ const products: Product[] = [
   },
   {
     id: "p16",
-    href: "#",
+    slug: "heavy-cotton-tee",
     image: "https://images.unsplash.com/photo-1609873814058-a8928924184a?w=500&h=660&fit=crop",
     name: "Heavy Cotton Tee",
     category: "T-Shirt",
@@ -183,8 +184,8 @@ function ProductCard({
 }) {
   return (
     <div className="group">
-      <a
-        href={product.href}
+      <Link
+        href={`/product/${product.slug}`}
         className="group relative mb-4 block aspect-[3/4] overflow-hidden bg-gray-50"
       >
         <Image
@@ -194,25 +195,25 @@ function ProductCard({
           sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, 25vw"
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onQuickAdd(product);
-          }}
-          className="absolute inset-0 flex items-end justify-center bg-black/10 pb-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-        >
-          <span className="bg-white px-6 py-2.5 text-xs font-semibold uppercase tracking-widest text-black">
+        <div className="pointer-events-none absolute inset-0 flex items-end justify-center bg-black/10 pb-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onQuickAdd(product);
+            }}
+            className="pointer-events-auto bg-white px-6 py-2.5 text-xs font-semibold uppercase tracking-widest text-black"
+          >
             Quick Add
-          </span>
-        </button>
+          </button>
+        </div>
         {product.badge && (
           <span className="absolute left-3 top-3 bg-black px-3 py-1.5 text-[10px] font-medium uppercase tracking-widest text-white">
             {product.badge}
           </span>
         )}
-      </a>
-      <a href={product.href}>
+      </Link>
+      <Link href={`/product/${product.slug}`}>
         <p className="mb-1 text-[10px] uppercase tracking-[0.2em] text-gray-500">
           {product.category}
         </p>
@@ -220,7 +221,7 @@ function ProductCard({
           {product.name}
         </h3>
         <p className="text-sm font-bold">{product.price}</p>
-      </a>
+      </Link>
     </div>
   );
 }

@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { useCategoryStore } from "@/src/store/useCategoryStore";
 
 interface CollectionCardProps {
   id: string;
@@ -60,44 +61,23 @@ function CollectionCard({
 }
 
 export default function CollectionsGrid() {
-  const [collections, setCollections] = useState<CollectionCardProps[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { categories, loading, fetchCategories } = useCategoryStore();
 
   useEffect(() => {
-    async function fetchCollections() {
-      try {
-        const response = await fetch("/api/categories");
-        if (!response.ok) throw new Error("Failed to fetch categories");
-        const data = await response.json();
+    fetchCategories();
+  }, [fetchCategories]);
 
-        const collectionImages: Record<string, string> = {
-          men: "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=800&h=1000&fit=crop",
-          women: "https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=800&h=1000&fit=crop",
-          accessories: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=900&h=560&fit=crop",
-          "new-in": "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=1000&fit=crop",
-          sale: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=900&h=560&fit=crop",
-        };
 
-        const mappedCollections = data.map((cat: any, index: number) => ({
-          id: `category-${cat.slug}-link`,
-          href: `/category/${cat.slug}`,
-          src: collectionImages[cat.slug] || "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=900&h=560&fit=crop",
-          alt: `${cat.name} Category`,
-          count: `${cat._count?.productCategories || 0} Produk`,
-          label: cat.name,
-          aspect: index < 3 ? "aspect-[4/5]" as const : "aspect-[16/10]" as const,
-          labelSize: index < 3 ? "text-2xl lg:text-3xl" as const : "text-xl lg:text-2xl" as const,
-        }));
-
-        setCollections(mappedCollections);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchCollections();
-  }, []);
+  const collections = categories.map((cat, index) => ({
+    id: `category-${cat.slug}-link`,
+    href: `/category/${cat.slug}`,
+    src: cat.productCategories[0]?.product?.image || "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=900&h=560&fit=crop",
+    alt: `${cat.name} Category`,
+    count: `${cat._count?.productCategories || 0} Produk`,
+    label: cat.name,
+    aspect: index < 3 ? "aspect-[4/5]" as const : "aspect-[16/10]" as const,
+    labelSize: index < 3 ? "text-2xl lg:text-3xl" as const : "text-xl lg:text-2xl" as const,
+  }));
 
   if (loading) {
     return (

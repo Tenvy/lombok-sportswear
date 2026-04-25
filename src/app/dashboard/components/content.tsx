@@ -12,6 +12,8 @@ import {
   TrendingUp,
   Wallet,
 } from "lucide-react";
+import DashboardHeader from "./header";
+import DashboardSidebar from "./sidebar";
 
 interface KpiCard {
   label: string;
@@ -108,7 +110,11 @@ const popularProducts = [
 
 export default function DashboardContent() {
   return (
-    <main className="flex-1 overflow-y-auto px-8 py-6">
+    <>
+    <DashboardSidebar />
+    <div className="flex flex-1 flex-col overflow-hidden">
+      <DashboardHeader />
+      <main className="flex-1 overflow-y-auto px-8 py-6">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold tracking-tight">Dashboard Overview</h1>
@@ -386,5 +392,7 @@ export default function DashboardContent() {
         </div>
       </div>
     </main>
+    </div>
+    </>
   );
 }

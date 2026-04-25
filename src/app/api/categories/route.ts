@@ -11,6 +11,16 @@ export async function GET() {
         _count: {
           select: { productCategories: true },
         },
+        productCategories: {
+          take: 1,
+          include: {
+            product: {
+              select: {
+                image: true,
+              },
+            },
+          },  
+        },
       },
     });
 
