@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, X, ShoppingBag, SlidersHorizontal } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, ShoppingBag, SlidersHorizontal, ChevronDown } from "lucide-react";
 import MobileFilter from "../../components/MobileFilter";
 
 interface Product {
@@ -225,14 +225,41 @@ function ProductCard({
   );
 }
 
+function FilterSection({
+  title,
+  defaultOpen = true,
+  children,
+}: {
+  title: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  return (
+    <div className="border-b border-gray-200 pb-4 mb-4">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between text-xs font-semibold uppercase tracking-[0.2em]"
+      >
+        {title}
+        <ChevronDown
+          className={`size-3.5 text-gray-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && <div className="mt-3">{children}</div>}
+    </div>
+  );
+}
+
 function SidebarFilters() {
   const [selectedSize, setSelectedSize] = useState("M");
   const [selectedColor, setSelectedColor] = useState("Black");
 
   return (
     <aside className="hidden w-[220px] flex-shrink-0 lg:block">
-      <div className="sticky top-[140px]">
-        <div className="mb-8 flex items-center justify-between">
+      <div className="sticky top-[80px] max-h-[80vh] overflow-y-auto scrollbar-hide">
+        <div className="mb-4 flex items-center justify-between">
           <h3 className="text-xs font-bold uppercase tracking-[0.25em]">
             Filter
           </h3>
@@ -245,11 +272,8 @@ function SidebarFilters() {
           </a>
         </div>
 
-        <div className="mb-8 border-b border-gray-200 pb-8">
-          <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em]">
-            Kategori
-          </h4>
-          <ul className="space-y-2.5">
+        <FilterSection title="Kategori">
+          <ul className="space-y-2">
             {categories.map((cat) => (
               <li key={cat.label}>
                 <a
@@ -270,12 +294,9 @@ function SidebarFilters() {
               </li>
             ))}
           </ul>
-        </div>
+        </FilterSection>
 
-        <div className="mb-8 border-b border-gray-200 pb-8">
-          <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em]">
-            Ukuran
-          </h4>
+        <FilterSection title="Ukuran">
           <div className="grid grid-cols-4 gap-2">
             {sizes.map((size) => (
               <button
@@ -291,12 +312,9 @@ function SidebarFilters() {
               </button>
             ))}
           </div>
-        </div>
+        </FilterSection>
 
-        <div className="mb-8 border-b border-gray-200 pb-8">
-          <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em]">
-            Warna
-          </h4>
+        <FilterSection title="Warna">
           <div className="flex flex-wrap gap-2.5">
             {colors.map((color) => (
               <button
@@ -311,13 +329,10 @@ function SidebarFilters() {
               />
             ))}
           </div>
-        </div>
+        </FilterSection>
 
-        <div className="mb-8">
-          <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em]">
-            Harga
-          </h4>
-          <div className="space-y-4">
+        <FilterSection title="Harga" defaultOpen={false}>
+          <div className="space-y-3">
             <div>
               <input
                 type="range"
@@ -339,7 +354,7 @@ function SidebarFilters() {
               <span>Rp 500.000</span>
             </div>
           </div>
-        </div>
+        </FilterSection>
 
         <button className="w-full bg-black py-3 text-xs font-semibold uppercase tracking-widest text-white transition-colors hover:bg-gray-800">
           Terapkan Filter
