@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Search, ShoppingBag, Menu, User } from "lucide-react";
+import { Search, ShoppingBag, Menu, User, LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/src/app/context/CartContext";
+import { useSession, signOut } from "next-auth/react";
 import MobileNavbar from "./MobileNavbar";
 import SearchNavbar from "./SearchNavbar";
 
@@ -12,6 +13,11 @@ export default function Navbar() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const { totalItems } = useCart();
+  const { data: session, status } = useSession();
+
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: "/" });
+  };
 
   return (
     <>
@@ -71,13 +77,48 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-            <Link
-              id="nav-user-link"
-              href="/profile"
-              className="transition-colors hover:text-gray-400"
-            >
-              <User className="size-[18px]" />
-            </Link>
+
+            {status === "loading" ? (
+              <div className="size-[18px] animate-pulse rounded-full bg-gray-200" />
+            ) : session?.user ? (
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-2 transition-colors hover:text-gray-400"
+                >
+                  {session.user.image ? (
+                    <Image
+                      src={session.user.image}
+                      alt={session.user.name || "User"}
+                      width={24}
+                      height={24}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <User className="size-[18px]" />
+                  )}
+                  <span className="hidden text-[11px] font-medium md:block">
+                    {session.user.name || "Account"}
+                  </span>
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="transition-colors hover:text-gray-400"
+                  title="Sign out"
+                >
+                  <LogOut className="size-[18px]" />
+                </button>
+              </div>
+            ) : (
+              <Link
+                id="nav-login-link"
+                href="/login"
+                className="text-[11px] font-semibold uppercase tracking-[0.18em] transition-colors hover:text-gray-400"
+              >
+                Sign In
+              </Link>
+            )}
+
             <button
               className="md:hidden"
               onClick={() => setMobileNavOpen(true)}
