@@ -1,6 +1,6 @@
 import Navbar from "@/src/components/Navbar";
 import HeroSection from "./components/HeroSection";
-import Collections from "./components/Collections";
+import Categories from "./components/Categories";
 import ProductDisplay from "./components/ProductDisplay";
 import Footer from "@/src/components/Footer";
 
@@ -9,7 +9,7 @@ export default function Home() {
     <div className="min-h-screen bg-white font-sans text-black">
       <Navbar />
       <HeroSection />
-      <Collections />
+      <Categories />
       <ProductDisplay />
       <Footer />
     </div>

@@ -66,11 +66,11 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  id="f-collections-link"
-                  href="#collections"
+                  id="f-categories-link"
+                  href="/category"
                   className="text-[10px] uppercase tracking-[0.1em] text-gray-400 transition-colors hover:text-black"
                 >
-                  Collections
+                  Categories
                 </a>
               </li>
             </ul>

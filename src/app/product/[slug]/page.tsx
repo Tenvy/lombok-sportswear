@@ -7,6 +7,7 @@ import { Heart, Share2, ChevronRight, Minus, Plus, ShoppingBag, Star } from "luc
 import Navbar from "@/src/components/Navbar";
 import Footer from "@/src/components/Footer";
 import { useCart } from "@/src/app/context/CartContext";
+import Link from "next/link";
 
 interface Product {
   id: string;
@@ -117,13 +118,13 @@ export default function ProductPage() {
       <div className="mx-auto max-w-[1400px] px-4 py-8 lg:px-8">
         {/* Breadcrumbs */}
         <nav className="mb-8 flex items-center gap-2 text-[11px] font-medium text-gray-400">
-          <a href="/" className="hover:text-black">Home</a>
+          <Link href="/" className="hover:text-black">Home</Link>
           <ChevronRight className="size-3" />
-          <a href="/products" className="hover:text-black">Produk</a>
+          <Link href="/products" className="hover:text-black">Produk</Link>
           {product.categories.length > 0 && (
             <>
               <ChevronRight className="size-3" />
-              <a href={`/collections/${product.categories[0].slug}`} className="hover:text-black">{product.categories[0].name}</a>
+              <Link href={`/category/${product.categories[0].slug}`} className="hover:text-black">{product.categories[0].name}</Link>
             </>
           )}
           <ChevronRight className="size-3" />

@@ -7,7 +7,7 @@ interface CollectionHeaderProps {
 }
 
 export default function CollectionSlugHeader({
-  name = "Collection",
+  name = "Category",
   productCount,
 }: CollectionHeaderProps) {
   return (
@@ -18,8 +18,8 @@ export default function CollectionSlugHeader({
             Home
           </Link>
           <ChevronRight className="size-[10px]" />
-          <Link href="/collections" className="transition-colors hover:text-black">
-            Koleksi
+          <Link href="/category" className="transition-colors hover:text-black">
+            Kategori
           </Link>
           <ChevronRight className="size-[10px]" />
           <span className="text-black">{name}</span>

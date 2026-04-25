@@ -15,6 +15,7 @@
     "db:seed": "bun --env-file=.env ./node_modules/.bin/prisma db seed"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1037.0",
     "@prisma/client": "^6",
     "dotenv": "^17.2.3",
     "lucide-react": "^1.8.0",

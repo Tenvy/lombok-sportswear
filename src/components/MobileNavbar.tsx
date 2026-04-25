@@ -11,9 +11,9 @@ interface MobileNavbarProps {
 }
 
 const navLinks = [
-  { label: "Men", href: "/#men" },
-  { label: "Women", href: "/#women" },
-  { label: "Collections", href: "/#collections" },
+  { label: "Men", href: "/category/men" },
+  { label: "Women", href: "/category/women" },
+  { label: "Categories", href: "/category" },
 ];
 
 export default function MobileNavbar({ isOpen, onClose, onSearchClick }: MobileNavbarProps) {

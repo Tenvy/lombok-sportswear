@@ -26,28 +26,28 @@ export default function Navbar() {
           <div className="hidden items-center gap-7 md:flex">
             <Link
               id="nav-men-link"
-              href="/collections/men"
+              href="/category/men"
               className="text-[11px] font-semibold uppercase tracking-[0.18em] transition-colors hover:text-gray-400"
             >
               Men
             </Link>
             <Link
               id="nav-women-link"
-              href="/collections/women"
+              href="/category/women"
               className="text-[11px] font-semibold uppercase tracking-[0.18em] transition-colors hover:text-gray-400"
             >
               Women
             </Link>
             <Link
-              id="nav-collections-link"
-              href="/collections"
+              id="nav-categories-link"
+              href="/category"
               className="text-[11px] font-semibold uppercase tracking-[0.18em] transition-colors hover:text-gray-400"
             >
-              Collections
+              Categories
             </Link>
           </div>
 
-          <Link id="nav-logo-link" href="/" className="absolute left-1/2 -translate-x-1/2">
+          <Link id="nav-logo-link" href="/" className="md:absolute md:left-1/2 md:-translate-x-1/2">
             <Image
               src="https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/brand-assets/heymale.id/logo-1776918650555.webp"
               alt="Lombok Sportswear"

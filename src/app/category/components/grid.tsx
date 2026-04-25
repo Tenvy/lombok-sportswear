@@ -79,10 +79,10 @@ export default function CollectionsGrid() {
         };
 
         const mappedCollections = data.map((cat: any, index: number) => ({
-          id: `collection-${cat.slug}-link`,
-          href: `/collections/${cat.slug}`,
+          id: `category-${cat.slug}-link`,
+          href: `/category/${cat.slug}`,
           src: collectionImages[cat.slug] || "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=900&h=560&fit=crop",
-          alt: `${cat.name} Collection`,
+          alt: `${cat.name} Category`,
           count: `${cat._count?.productCategories || 0} Produk`,
           label: cat.name,
           aspect: index < 3 ? "aspect-[4/5]" as const : "aspect-[16/10]" as const,
@@ -91,7 +91,7 @@ export default function CollectionsGrid() {
 
         setCollections(mappedCollections);
       } catch (error) {
-        console.error("Error fetching collections:", error);
+        console.error("Error fetching categories:", error);
       } finally {
         setLoading(false);
       }
@@ -104,7 +104,7 @@ export default function CollectionsGrid() {
       <section className="bg-white pb-20 lg:pb-28">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="flex items-center justify-center py-20">
-            <div className="animate-pulse text-gray-400">Loading collections...</div>
+            <div className="animate-pulse text-gray-400">Loading categories...</div>
           </div>
         </div>
       </section>

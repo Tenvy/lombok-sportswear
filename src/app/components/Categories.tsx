@@ -55,7 +55,7 @@ const collections = [
   },
 ];
 
-export default function Collections() {
+export default function Categories() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: "left" | "right") => {
@@ -66,11 +66,11 @@ export default function Collections() {
   };
 
   return (
-    <section id="collections" className="py-8 md:py-12">
+    <section id="categories" className="py-8 md:py-12">
       <div className="mx-auto max-w-[1400px] px-4 lg:px-8">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-xs font-bold uppercase tracking-[0.25em] md:text-sm">
-            Our Collections
+            Our Categories
           </h2>
           <div className="flex items-center gap-1 text-gray-300">
             <button onClick={() => scroll("left")} aria-label="Scroll left">
