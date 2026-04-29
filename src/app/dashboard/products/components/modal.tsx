@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { Upload, Plus, Trash2 } from "lucide-react";
 import {
@@ -28,10 +28,121 @@ interface Product {
   outOfStock: boolean;
 }
 
+const CategorySection = memo(({ allCategories, selectedCategories, onToggle }: {
+  allCategories: string[];
+  selectedCategories: string[];
+  onToggle: (cat: string) => void;
+}) => (
+  <div>
+    <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
+      Categories
+    </label>
+    <div className="flex flex-wrap gap-2">
+      {allCategories.map((cat) => (
+        <label key={cat} className="group flex cursor-pointer items-center gap-1.5">
+          <input
+            type="checkbox"
+            checked={selectedCategories.includes(cat)}
+            onChange={() => onToggle(cat)}
+            className="h-3.5 w-3.5 rounded accent-black"
+          />
+          <span className="text-[12px] text-gray-600 transition-colors group-hover:text-black">
+            {cat}
+          </span>
+        </label>
+      ))}
+    </div>
+  </div>
+));
+CategorySection.displayName = "CategorySection";
+
+const SizeVariantSection = memo(({ variants, onChange, onAdd, onRemove }: any) => (
+  <div>
+    <div className="mb-3 flex items-center justify-between">
+      <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
+        Size Variants
+      </label>
+      <button onClick={onAdd} className="flex items-center gap-1 text-[11px] font-medium text-gray-400 transition-colors hover:text-black">
+        <Plus className="size-3" />
+        Add Size
+      </button>
+    </div>
+    <div className="space-y-2">
+      {variants.map((variant: any, index: number) => (
+        <div key={variant.size} className="flex items-center gap-3 rounded-md border border-gray-100 px-3 py-2">
+          <input
+            type="checkbox"
+            checked={variant.enabled}
+            onChange={() => onChange(index, "enabled", !variant.enabled)}
+            className="h-3.5 w-3.5 rounded accent-black"
+          />
+          <span className="w-10 text-[12px] font-semibold">{variant.size}</span>
+          <span className="text-[11px] text-gray-400">Stock:</span>
+          <input
+            type="number"
+            value={variant.stock}
+            onChange={(e) => onChange(index, "stock", e.target.value)}
+            className="w-16 rounded border border-gray-200 px-2 py-1 text-center text-[12px] focus:border-gray-400 focus:outline-none"
+          />
+          <button onClick={() => onRemove(index)} className="ml-auto text-gray-300 transition-colors hover:text-red-500">
+            <Trash2 className="size-3.5" />
+          </button>
+        </div>
+      ))}
+    </div>
+  </div>
+));
+SizeVariantSection.displayName = "SizeVariantSection";
+
+const ColorVariantSection = memo(({ variants, onChange, onAdd, onRemove }: any) => (
+  <div>
+    <div className="mb-3 flex items-center justify-between">
+      <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
+        Color Variants
+      </label>
+      <button onClick={onAdd} className="flex items-center gap-1 text-[11px] font-medium text-gray-400 transition-colors hover:text-black">
+        <Plus className="size-3" />
+        Add Color
+      </button>
+    </div>
+    <div className="space-y-2">
+      {variants.map((color: any, index: number) => (
+        <div key={color.name} className="flex items-center gap-3 rounded-md border border-gray-100 px-3 py-2">
+          <input
+            type="checkbox"
+            checked={color.enabled}
+            onChange={() => onChange(index, "enabled", !color.enabled)}
+            className="h-3.5 w-3.5 rounded accent-black"
+          />
+          <span className="h-5 w-5 rounded-full border border-gray-200" style={{ backgroundColor: color.hex }} />
+          <input
+            type="text"
+            value={color.name}
+            onChange={(e) => onChange(index, "name", e.target.value)}
+            className="w-24 rounded border border-gray-200 px-2 py-1 text-[12px] focus:border-gray-400 focus:outline-none"
+          />
+          <input
+            type="text"
+            value={color.hex}
+            onChange={(e) => onChange(index, "hex", e.target.value)}
+            className="w-20 rounded border border-gray-200 px-2 py-1 text-[12px] focus:border-gray-400 focus:outline-none"
+          />
+          <button onClick={() => onRemove(index)} className="ml-auto text-gray-300 transition-colors hover:text-red-500">
+            <Trash2 className="size-3.5" />
+          </button>
+        </div>
+      ))}
+    </div>
+  </div>
+));
+ColorVariantSection.displayName = "ColorVariantSection";
+
 export default function ProductEditModal({
+  open,
   product,
   onClose,
 }: {
+  open: boolean;
   product?: Product;
   onClose: () => void;
 }) {
@@ -43,23 +154,14 @@ export default function ProductEditModal({
   const isEdit = !!product;
 
   const [formData, setFormData] = useState({
-    name: product?.name ?? "",
-    sku: product?.sku ?? "",
-    price: product?.price.replace("Rp ", "").replace(/\./g, "") ?? "",
-    categories: (product?.categories ?? []).map((c) => c.name),
-    stock: product?.stock.toString() ?? "0",
-    status: product?.status ?? "Draft",
+    name: "",
+    sku: "",
+    price: "",
+    categories: [] as string[],
+    stock: "0",
+    status: "Draft",
     description: "",
   });
-
-  const toggleCategory = (cat: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      categories: prev.categories.includes(cat)
-        ? prev.categories.filter((c) => c !== cat)
-        : [...prev.categories, cat],
-    }));
-  };
 
   const [sizeVariants, setSizeVariants] = useState([
     { size: "S", stock: "12", enabled: true },
@@ -75,8 +177,67 @@ export default function ProductEditModal({
     { name: "Gray", hex: "#6B7280", enabled: false },
   ]);
 
+  useEffect(() => {
+    if (open) {
+      setFormData({
+        name: product?.name ?? "",
+        sku: product?.sku ?? "",
+        price: product?.price.replace("Rp ", "").replace(/\./g, "") ?? "",
+        categories: (product?.categories ?? []).map((c) => c.name),
+        stock: product?.stock.toString() ?? "0",
+        status: product?.status ?? "Draft",
+        description: "",
+      });
+    }
+  }, [open, product]);
+
+  const updateField = useCallback((field: keyof typeof formData, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  }, []);
+
+  const toggleCategory = useCallback((cat: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      categories: prev.categories.includes(cat)
+        ? prev.categories.filter((c) => c !== cat)
+        : [...prev.categories, cat],
+    }));
+  }, []);
+
+  const updateSizeVariant = useCallback((index: number, field: string, value: any) => {
+    setSizeVariants((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], [field]: value };
+      return next;
+    });
+  }, []);
+
+  const addSizeVariant = useCallback(() => {
+    setSizeVariants((prev) => [...prev, { size: "New", stock: "0", enabled: true }]);
+  }, []);
+
+  const removeSizeVariant = useCallback((index: number) => {
+    setSizeVariants((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const updateColorVariant = useCallback((index: number, field: string, value: any) => {
+    setColorVariants((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], [field]: value };
+      return next;
+    });
+  }, []);
+
+  const addColorVariant = useCallback(() => {
+    setColorVariants((prev) => [...prev, { name: "New Color", hex: "#000000", enabled: true }]);
+  }, []);
+
+  const removeColorVariant = useCallback((index: number) => {
+    setColorVariants((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
   return (
-    <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
       <DialogContent
         showCloseButton={false}
         className="top-[5%] max-h-[90vh] -translate-y-0 sm:max-w-3xl overflow-y-auto rounded-lg p-0"
@@ -99,7 +260,7 @@ export default function ProductEditModal({
               <input
                 type="text"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) => updateField("name", e.target.value)}
                 className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
               />
             </div>
@@ -111,34 +272,16 @@ export default function ProductEditModal({
               <input
                 type="text"
                 value={formData.sku}
-                onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                onChange={(e) => updateField("sku", e.target.value)}
                 className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
               />
             </div>
 
-            <div>
-                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
-                  Categories
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {allCategories.map((cat) => (
-                    <label
-                      key={cat}
-                      className="group flex cursor-pointer items-center gap-1.5"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={formData.categories.includes(cat)}
-                        onChange={() => toggleCategory(cat)}
-                        className="h-3.5 w-3.5 rounded accent-black"
-                      />
-                      <span className="text-[12px] text-gray-600 transition-colors group-hover:text-black">
-                        {cat}
-                      </span>
-                    </label>
-                  ))}
-              </div>
-            </div>
+            <CategorySection
+              allCategories={allCategories}
+              selectedCategories={formData.categories}
+              onToggle={toggleCategory}
+            />
 
             <div className="grid grid-cols-3 gap-4">
               <div>
@@ -148,7 +291,7 @@ export default function ProductEditModal({
                 <input
                   type="text"
                   value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  onChange={(e) => updateField("price", e.target.value)}
                   className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
                 />
               </div>
@@ -159,7 +302,7 @@ export default function ProductEditModal({
                 <input
                   type="number"
                   value={formData.stock}
-                  onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                  onChange={(e) => updateField("stock", e.target.value)}
                   className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
                 />
               </div>
@@ -169,7 +312,7 @@ export default function ProductEditModal({
                 </label>
                 <select
                   value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  onChange={(e) => updateField("status", e.target.value)}
                   className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
                 >
                   <option>Published</option>
@@ -186,121 +329,25 @@ export default function ProductEditModal({
               <textarea
                 rows={3}
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) => updateField("description", e.target.value)}
                 placeholder="Product description..."
                 className="w-full resize-none rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
               />
             </div>
 
-            <div>
-              <div className="mb-3 flex items-center justify-between">
-                <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
-                  Size Variants
-                </label>
-                <button className="flex items-center gap-1 text-[11px] font-medium text-gray-400 transition-colors hover:text-black">
-                  <Plus className="size-3" />
-                  Add Size
-                </button>
-              </div>
-              <div className="space-y-2">
-                {sizeVariants.map((variant, index) => (
-                  <div
-                    key={variant.size}
-                    className="flex items-center gap-3 rounded-md border border-gray-100 px-3 py-2"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={variant.enabled}
-                      onChange={() => {
-                        const updated = [...sizeVariants];
-                        updated[index] = { ...updated[index], enabled: !updated[index].enabled };
-                        setSizeVariants(updated);
-                      }}
-                      className="h-3.5 w-3.5 rounded accent-black"
-                    />
-                    <span className="w-10 text-[12px] font-semibold">{variant.size}</span>
-                    <span className="text-[11px] text-gray-400">Stock:</span>
-                    <input
-                      type="number"
-                      value={variant.stock}
-                      onChange={(e) => {
-                        const updated = [...sizeVariants];
-                        updated[index] = { ...updated[index], stock: e.target.value };
-                        setSizeVariants(updated);
-                      }}
-                      className="w-16 rounded border border-gray-200 px-2 py-1 text-center text-[12px] focus:border-gray-400 focus:outline-none"
-                    />
-                    <button
-                      onClick={() => setSizeVariants(sizeVariants.filter((_, i) => i !== index))}
-                      className="ml-auto text-gray-300 transition-colors hover:text-red-500"
-                    >
-                      <Trash2 className="size-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <SizeVariantSection
+              variants={sizeVariants}
+              onChange={updateSizeVariant}
+              onAdd={addSizeVariant}
+              onRemove={removeSizeVariant}
+            />
 
-            <div>
-              <div className="mb-3 flex items-center justify-between">
-                <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
-                  Color Variants
-                </label>
-                <button className="flex items-center gap-1 text-[11px] font-medium text-gray-400 transition-colors hover:text-black">
-                  <Plus className="size-3" />
-                  Add Color
-                </button>
-              </div>
-              <div className="space-y-2">
-                {colorVariants.map((color, index) => (
-                  <div
-                    key={color.name}
-                    className="flex items-center gap-3 rounded-md border border-gray-100 px-3 py-2"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={color.enabled}
-                      onChange={() => {
-                        const updated = [...colorVariants];
-                        updated[index] = { ...updated[index], enabled: !updated[index].enabled };
-                        setColorVariants(updated);
-                      }}
-                      className="h-3.5 w-3.5 rounded accent-black"
-                    />
-                    <span
-                      className="h-5 w-5 rounded-full border border-gray-200"
-                      style={{ backgroundColor: color.hex }}
-                    />
-                    <input
-                      type="text"
-                      value={color.name}
-                      onChange={(e) => {
-                        const updated = [...colorVariants];
-                        updated[index] = { ...updated[index], name: e.target.value };
-                        setColorVariants(updated);
-                      }}
-                      className="w-24 rounded border border-gray-200 px-2 py-1 text-[12px] focus:border-gray-400 focus:outline-none"
-                    />
-                    <input
-                      type="text"
-                      value={color.hex}
-                      onChange={(e) => {
-                        const updated = [...colorVariants];
-                        updated[index] = { ...updated[index], hex: e.target.value };
-                        setColorVariants(updated);
-                      }}
-                      className="w-20 rounded border border-gray-200 px-2 py-1 text-[12px] focus:border-gray-400 focus:outline-none"
-                    />
-                    <button
-                      onClick={() => setColorVariants(colorVariants.filter((_, i) => i !== index))}
-                      className="ml-auto text-gray-300 transition-colors hover:text-red-500"
-                    >
-                      <Trash2 className="size-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ColorVariantSection
+              variants={colorVariants}
+              onChange={updateColorVariant}
+              onAdd={addColorVariant}
+              onRemove={removeColorVariant}
+            />
           </div>
 
           <div className="space-y-5">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   RefreshCw,
   UploadCloud,
@@ -25,30 +25,46 @@ interface Category {
 }
 
 export default function CategoryModal({
+  open,
   category,
   onClose,
 }: {
+  open: boolean;
   category?: Category;
   onClose: () => void;
 }) {
   const isEdit = !!category;
 
   const [formData, setFormData] = useState({
-    name: category?.name ?? "",
-    slug: category?.slug ?? "",
-    parent: category?.sub.includes("Child of") ? "Men's Collection" : "No Parent (Top Level)",
-    status: category?.status ?? "Active",
-    description: category?.desc ?? "",
+    name: "",
+    slug: "",
+    parent: "No Parent (Top Level)",
+    status: "Active",
+    description: "",
     metaDescription: "",
     metaKeywords: "",
   });
+
+  useEffect(() => {
+    if (open) {
+      setFormData({
+        name: category?.name ?? "",
+        slug: category?.slug ?? "",
+        parent: category?.sub.includes("Child of") ? "Men's Collection" : "No Parent (Top Level)",
+        status: category?.status ?? "Active",
+        description: category?.desc ?? "",
+        metaDescription: "",
+        metaKeywords: "",
+      });
+    }
+  }, [open, category]);
 
   const update = (key: keyof typeof formData, value: string) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
   return (
-    <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
       <DialogContent showCloseButton={false} className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-[14px] font-bold tracking-tight">

@@ -34,7 +34,10 @@ export default function OrdersContent() {
 
   return (
     <>
-      {showExportModal && <ExportModal onClose={() => setShowExportModal(false)} />}
+      <ExportModal
+        open={showExportModal}
+        onClose={() => setShowExportModal(false)}
+      />
       <DashboardHeader />
       <main className="flex-1 overflow-y-auto px-8 py-6">
         <div className="mb-6 flex items-center justify-between">

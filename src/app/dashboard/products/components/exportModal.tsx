@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-export default function ExportModal({ onClose }: { onClose: () => void }) {
+export default function ExportModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [format, setFormat] = useState<"csv" | "excel">("csv");
 
   const [fields, setFields] = useState({
@@ -47,7 +47,7 @@ export default function ExportModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
       <DialogContent showCloseButton={false} className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-[14px] font-bold tracking-tight">

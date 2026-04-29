@@ -24,9 +24,9 @@ import {
   Minus,
 } from "lucide-react";
 import CategoryModal from "./modal";
-import CategoriesTable from "./table";
+import CategoriesTable, { Category } from "./table";
 
-const categories = [
+const categories: Category[] = [
   { id: "cat-mens", icon: Shirt, iconBg: "bg-gray-100", iconColor: "text-gray-500", name: "Men's Collection", sub: "Parent · 3 subcategories", slug: "mens-collection", desc: "Premium sportswear for men. All styles.", products: 156, status: "Active", created: "2 months ago", isParent: true, nameClass: "font-semibold" },
   { id: "cat-polo", icon: Tag, iconBg: "bg-gray-50", iconColor: "text-gray-400", name: "Polo Shirts", sub: "Child of Men's Collection", slug: "polo-shirts", desc: "Classic polo shirts for everyday wear", products: 42, status: "Active", created: "2 months ago", isParent: false, nameClass: "font-medium", isChild: true },
   { id: "cat-tshirts", icon: Tag, iconBg: "bg-gray-50", iconColor: "text-gray-400", name: "T-Shirts", sub: "Child of Men's Collection", slug: "t-shirts", desc: "Comfortable crew neck and v-neck tees", products: 38, status: "Active", created: "6 weeks ago", isParent: false, nameClass: "font-medium", isChild: true },
@@ -53,19 +53,18 @@ const kpis = [
 
 export default function CategoryContent() {
   const [showModal, setShowModal] = useState(false);
-  const [editCategory, setEditCategory] = useState<typeof categories[number] | null>(null);
+  const [editCategory, setEditCategory] = useState<Category | null>(null);
 
   return (
     <main className="flex-1 overflow-y-auto px-8 py-6">
-      {showModal && (
-        <CategoryModal
-          category={editCategory ?? undefined}
-          onClose={() => {
-            setShowModal(false);
-            setEditCategory(null);
-          }}
-        />
-      )}
+      <CategoryModal
+        open={showModal}
+        category={editCategory ?? undefined}
+        onClose={() => {
+          setShowModal(false);
+          setEditCategory(null);
+        }}
+      />
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold tracking-tight">Category Management</h1>

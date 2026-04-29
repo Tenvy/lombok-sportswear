@@ -413,60 +413,57 @@ export default function ProductsTable({
         </div>
       </div>
 
-      {editProduct && (
-        <ProductEditModal
-          product={editProduct}
-          onClose={() => setEditProduct(null)}
-        />
-      )}
+      <ProductEditModal
+        open={!!editProduct}
+        product={editProduct ?? undefined}
+        onClose={() => setEditProduct(null)}
+      />
 
-      {deleteProduct && (
-        <Dialog open onOpenChange={(open) => { if (!open) setDeleteProduct(null); }}>
-          <DialogContent showCloseButton={false} className="sm:max-w-md">
-            <DialogHeader>
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50">
-                <AlertTriangle className="size-6 text-red-500" />
-              </div>
-              <DialogTitle className="text-center text-[15px] font-bold tracking-tight">
-                Delete Product
-              </DialogTitle>
-              <DialogDescription className="text-center text-[12px] text-gray-500">
-                Are you sure you want to delete <span className="font-semibold text-gray-700">{deleteProduct.name}</span>? This action cannot be undone.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex items-center justify-center gap-2">
-              <DialogClose render={<Button variant="outline" size="sm" />}>
-                Cancel
-              </DialogClose>
-              <Button variant="destructive" size="sm" onClick={() => setDeleteProduct(null)}>
-                Delete
-              </Button>
+      <Dialog open={!!deleteProduct} onOpenChange={(open) => { if (!open) setDeleteProduct(null); }}>
+        <DialogContent showCloseButton={false} className="sm:max-w-md">
+          <DialogHeader>
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50">
+              <AlertTriangle className="size-6 text-red-500" />
             </div>
-          </DialogContent>
-        </Dialog>
-      )}
+            <DialogTitle className="text-center text-[15px] font-bold tracking-tight">
+              Delete Product
+            </DialogTitle>
+            <DialogDescription className="text-center text-[12px] text-gray-500">
+              Are you sure you want to delete <span className="font-semibold text-gray-700">{deleteProduct?.name}</span>? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center justify-center gap-2">
+            <DialogClose render={<Button variant="outline" size="sm" />}>
+              Cancel
+            </DialogClose>
+            <Button variant="destructive" size="sm" onClick={() => setDeleteProduct(null)}>
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-      {showBulkConfirm && bulkAction && (
-        <Dialog open onOpenChange={(open) => { if (!open) setShowBulkConfirm(false); }}>
-          <DialogContent showCloseButton={false} className="sm:max-w-md">
-            <DialogHeader>
-              <div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-full ${bulkConfig[bulkAction as keyof typeof bulkConfig].iconBg}`}>
-                {(() => {
-                  const Icon = bulkConfig[bulkAction as keyof typeof bulkConfig].icon;
-                  return <Icon className={`size-6 ${bulkConfig[bulkAction as keyof typeof bulkConfig].iconColor}`} />;
-                })()}
-              </div>
-              <DialogTitle className="text-center text-[15px] font-bold tracking-tight">
-                {bulkConfig[bulkAction as keyof typeof bulkConfig].title}
-              </DialogTitle>
-              <DialogDescription className="text-center text-[12px] text-gray-500">
-                {bulkConfig[bulkAction as keyof typeof bulkConfig].desc}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex items-center justify-center gap-2">
-              <DialogClose render={<Button variant="outline" size="sm" />}>
-                Cancel
-              </DialogClose>
+      <Dialog open={showBulkConfirm && !!bulkAction} onOpenChange={(open) => { if (!open) setShowBulkConfirm(false); }}>
+        <DialogContent showCloseButton={false} className="sm:max-w-md">
+          <DialogHeader>
+            <div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-full ${bulkAction ? bulkConfig[bulkAction as keyof typeof bulkConfig].iconBg : ""}`}>
+              {bulkAction && (() => {
+                const Icon = bulkConfig[bulkAction as keyof typeof bulkConfig].icon;
+                return <Icon className={`size-6 ${bulkConfig[bulkAction as keyof typeof bulkConfig].iconColor}`} />;
+              })()}
+            </div>
+            <DialogTitle className="text-center text-[15px] font-bold tracking-tight">
+              {bulkAction && bulkConfig[bulkAction as keyof typeof bulkConfig].title}
+            </DialogTitle>
+            <DialogDescription className="text-center text-[12px] text-gray-500">
+              {bulkAction && bulkConfig[bulkAction as keyof typeof bulkConfig].desc}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center justify-center gap-2">
+            <DialogClose render={<Button variant="outline" size="sm" />}>
+              Cancel
+            </DialogClose>
+            {bulkAction && (
               <Button
                 variant={bulkConfig[bulkAction as keyof typeof bulkConfig].btnVariant}
                 size="sm"
@@ -478,10 +475,10 @@ export default function ProductsTable({
               >
                 {bulkConfig[bulkAction as keyof typeof bulkConfig].btnLabel}
               </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

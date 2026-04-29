@@ -38,14 +38,18 @@ const statusColors: Record<string, string> = {
 };
 
 export default function OrderPreviewModal({
+  open,
   order,
   onClose,
 }: {
-  order: Order;
+  open: boolean;
+  order: Order | null;
   onClose: () => void;
 }) {
+  if (!order) return null;
+
   return (
-    <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
       <DialogContent
         showCloseButton={false}
         className="sm:max-w-lg overflow-y-auto max-h-[85vh] rounded-lg p-0"

@@ -240,19 +240,17 @@ export default function OrdersTable({
       </div>
       </div>
 
-      {previewOrder && (
-        <OrderPreviewModal
-          order={previewOrder}
-          onClose={() => setPreviewOrder(null)}
-        />
-      )}
+      <OrderPreviewModal
+        open={!!previewOrder}
+        order={previewOrder}
+        onClose={() => setPreviewOrder(null)}
+      />
 
-      {editOrder && (
-        <OrderEditModal
-          order={editOrder}
-          onClose={() => setEditOrder(null)}
-        />
-      )}
+      <OrderEditModal
+        open={!!editOrder}
+        order={editOrder}
+        onClose={() => setEditOrder(null)}
+      />
     </>
   );
 }

@@ -18,7 +18,7 @@ export default function CollectionSlugPage() {
   }, [categories.length, fetchCategories]);
 
   const category = categories.find((c) => c.slug === slug);
-  const showHeader = !loading && category;
+  const showHeader = !!(!loading && category);
 
   return (
     <div className="min-h-screen bg-white font-sans text-black">

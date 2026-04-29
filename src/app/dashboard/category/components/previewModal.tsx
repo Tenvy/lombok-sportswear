@@ -10,19 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-interface Category {
-  id: string;
-  name: string;
-  sub: string;
-  slug: string;
-  desc: string;
-  products: number;
-  status: string;
-  created: string;
-  icon: React.ComponentType<{ className?: string }>;
-  iconBg: string;
-  iconColor: string;
-}
+import { Category } from "./table";
 
 const statusBadge = (status: string) => {
   const styles: Record<string, string> = {
@@ -34,12 +22,16 @@ const statusBadge = (status: string) => {
 };
 
 export default function PreviewModal({
+  open,
   category,
   onClose,
 }: {
-  category: Category;
+  open: boolean;
+  category: Category | null;
   onClose: () => void;
 }) {
+  if (!category) return null;
+
   const IconComp = category.icon;
 
   const fields = [
@@ -54,7 +46,7 @@ export default function PreviewModal({
   ];
 
   return (
-    <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
       <DialogContent showCloseButton={false} className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-[14px] font-bold tracking-tight">

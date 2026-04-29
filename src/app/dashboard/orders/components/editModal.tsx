@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -34,20 +34,34 @@ const statusColors: Record<string, string> = {
 };
 
 export default function OrderEditModal({
+  open,
   order,
   onClose,
 }: {
-  order: Order;
+  open: boolean;
+  order: Order | null;
   onClose: () => void;
 }) {
   const [formData, setFormData] = useState({
-    status: order.status,
-    payment: order.payment,
+    status: "",
+    payment: "",
     notes: "",
   });
 
+  useEffect(() => {
+    if (open && order) {
+      setFormData({
+        status: order.status,
+        payment: order.payment,
+        notes: "",
+      });
+    }
+  }, [open, order]);
+
+  if (!order) return null;
+
   return (
-    <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
       <DialogContent
         showCloseButton={false}
         className="top-[5%] max-h-[90vh] -translate-y-0 sm:max-w-lg overflow-y-auto rounded-lg p-0"

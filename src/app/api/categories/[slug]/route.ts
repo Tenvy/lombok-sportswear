@@ -12,12 +12,13 @@ export async function GET(
       where: { slug },
       include: {
         productCategories: {
-          include: {
+          where: {
             product: {
-              where: {
-                soldOut: false,
-              },
+              soldOut: false,
             },
+          },
+          include: {
+            product: true,
           },
         },
       },

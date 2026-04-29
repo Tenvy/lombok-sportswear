@@ -21,9 +21,9 @@ import {
 import { Button } from "@/components/ui/button";
 import PreviewModal from "./previewModal";
 
-interface Category {
+export interface Category {
   id: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ElementType;
   iconBg: string;
   iconColor: string;
   name: string;
@@ -62,38 +62,35 @@ export default function CategoriesTable({
 
   return (
     <>
-      {previewCategory && (
-        <PreviewModal
-          category={previewCategory}
-          onClose={() => setPreviewCategory(null)}
-        />
-      )}
+      <PreviewModal
+        open={!!previewCategory}
+        category={previewCategory}
+        onClose={() => setPreviewCategory(null)}
+      />
 
-      {deleteCategory && (
-        <Dialog open onOpenChange={(open) => { if (!open) setDeleteCategory(null); }}>
-          <DialogContent showCloseButton={false} className="sm:max-w-md">
-            <DialogHeader>
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50">
-                <AlertTriangle className="size-6 text-red-500" />
-              </div>
-              <DialogTitle className="text-center text-[15px] font-bold tracking-tight">
-                Delete Category
-              </DialogTitle>
-              <DialogDescription className="text-center text-[12px] text-gray-500">
-                Are you sure you want to delete <span className="font-semibold text-gray-700">{deleteCategory.name}</span>? This action cannot be undone.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex items-center justify-center gap-2">
-              <DialogClose render={<Button variant="outline" size="sm" />}>
-                Cancel
-              </DialogClose>
-              <Button variant="destructive" size="sm" onClick={() => setDeleteCategory(null)}>
-                Delete
-              </Button>
+      <Dialog open={!!deleteCategory} onOpenChange={(open) => { if (!open) setDeleteCategory(null); }}>
+        <DialogContent showCloseButton={false} className="sm:max-w-md">
+          <DialogHeader>
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50">
+              <AlertTriangle className="size-6 text-red-500" />
             </div>
-          </DialogContent>
-        </Dialog>
-      )}
+            <DialogTitle className="text-center text-[15px] font-bold tracking-tight">
+              Delete Category
+            </DialogTitle>
+            <DialogDescription className="text-center text-[12px] text-gray-500">
+              Are you sure you want to delete <span className="font-semibold text-gray-700">{deleteCategory?.name}</span>? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center justify-center gap-2">
+            <DialogClose render={<Button variant="outline" size="sm" />}>
+              Cancel
+            </DialogClose>
+            <Button variant="destructive" size="sm" onClick={() => setDeleteCategory(null)}>
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
       <div className="flex items-center justify-between gap-3 border-b border-gray-100 px-5 py-3">
         <div className="flex flex-1 items-center gap-2">

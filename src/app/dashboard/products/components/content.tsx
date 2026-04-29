@@ -38,8 +38,14 @@ export default function ProductsContent() {
 
   return (
     <div className="flex-1 p-6">
-      {showCreateModal && <ProductEditModal onClose={() => setShowCreateModal(false)} />}
-      {showExportModal && <ExportModal onClose={() => setShowExportModal(false)} />}
+      <ProductEditModal
+        open={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+      />
+      <ExportModal
+        open={showExportModal}
+        onClose={() => setShowExportModal(false)}
+      />
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold tracking-tight">Products</h1>
