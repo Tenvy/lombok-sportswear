@@ -6,12 +6,9 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Package,
-  FileText,
   ShoppingCart,
   Users,
-  BarChart3,
-  Monitor,
-  Settings,
+  Tag,
   LogOut,
 } from "lucide-react";
 
@@ -37,6 +34,12 @@ const mainLinks: SidebarLink[] = [
     label: "Products",
   },
   {
+    id: "sidebar-category",
+    href: "/dashboard/category",
+    icon: <Tag className="text-base" />,
+    label: "Category",
+  },
+  {
     id: "sidebar-orders",
     href: "/dashboard/orders",
     icon: <ShoppingCart className="text-base" />,
@@ -51,27 +54,6 @@ const managementLinks: SidebarLink[] = [
     href: "/dashboard/customers",
     icon: <Users className="text-base" />,
     label: "Customers",
-  },
-  {
-    id: "sidebar-analytics",
-    href: "/dashboard/analytics",
-    icon: <BarChart3 className="text-base" />,
-    label: "Analytics",
-  },
-  {
-    id: "sidebar-pos",
-    href: "/dashboard/pos",
-    icon: <Monitor className="text-base" />,
-    label: "Point of Sale",
-  },
-];
-
-const systemLinks: SidebarLink[] = [
-  {
-    id: "sidebar-settings",
-    href: "/dashboard/settings",
-    icon: <Settings className="text-base" />,
-    label: "Settings",
   },
 ];
 
@@ -134,27 +116,7 @@ export default function DashboardSidebar() {
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 pb-4 pt-2">
         <SidebarSection title="Main" links={mainLinks} pathname={pathname} />
         <SidebarSection title="Management" links={managementLinks} pathname={pathname} />
-        <SidebarSection title="System" links={systemLinks} pathname={pathname} />
       </nav>
-
-      <div className="flex items-center gap-3 border-t border-gray-100 px-4 py-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-900 text-[11px] font-bold text-white">
-          AD
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-[12px] font-semibold">Admin Utama</p>
-          <p className="truncate text-[10px] text-gray-400">
-            admin@lomboksw.id
-          </p>
-        </div>
-        <a
-          id="sidebar-logout"
-          href="#"
-          className="text-gray-400 transition-colors hover:text-black"
-        >
-          <LogOut className="text-sm" />
-        </a>
-      </div>
     </aside>
   );
 }
