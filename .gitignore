@@ -48,3 +48,6 @@ next-env.d.ts
 
 # prisma sqlite db
 dev.db
+
+# bun
+bun.lock
