@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
+import { useProductStore } from "@/src/store/useProductStore";
+import { useCategoryStore } from "@/src/store/useCategoryStore";
 
 function FilterSection({
   title,
@@ -30,7 +32,79 @@ function FilterSection({
   );
 }
 
+const STOCK_OPTIONS = [
+  { label: "In Stock", value: "in_stock", color: "bg-emerald-500" },
+  { label: "Low Stock", value: "low_stock", color: "bg-amber-500" },
+  { label: "Out of Stock", value: "out_of_stock", color: "bg-red-500" },
+];
+
+const STATUS_OPTIONS = [
+  { label: "Published", value: "PUBLISHED" },
+  { label: "Draft", value: "DRAFT" },
+];
+
 export default function ProductFilter() {
+  const {
+    categoryFilters,
+    stockFilters,
+    maxPrice,
+    statusFilters,
+    fetchProducts,
+  } = useProductStore();
+  const { categories, fetchCategories } = useCategoryStore();
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  const [localCategories, setLocalCategories] = useState<string[]>(categoryFilters);
+  const [localStock, setLocalStock] = useState<string[]>(stockFilters);
+  const [localMaxPrice, setLocalMaxPrice] = useState<number>(maxPrice ?? 500000);
+  const [localStatus, setLocalStatus] = useState<string[]>(statusFilters);
+
+  const toggleCategory = (label: string) => {
+    setLocalCategories((prev) =>
+      prev.includes(label) ? prev.filter((c) => c !== label) : [...prev, label]
+    );
+  };
+
+  const toggleStock = (value: string) => {
+    setLocalStock((prev) =>
+      prev.includes(value) ? prev.filter((s) => s !== value) : [...prev, value]
+    );
+  };
+
+  const toggleStatus = (value: string) => {
+    setLocalStatus((prev) =>
+      prev.includes(value) ? prev.filter((s) => s !== value) : [...prev, value]
+    );
+  };
+
+  const apply = () => {
+    fetchProducts({
+      page: 1,
+      categoryFilters: localCategories,
+      stockFilters: localStock,
+      maxPrice: localMaxPrice >= 500000 ? null : localMaxPrice,
+      statusFilters: localStatus,
+    });
+  };
+
+  const clear = () => {
+    setLocalCategories([]);
+    setLocalStock([]);
+    setLocalMaxPrice(500000);
+    setLocalStatus([]);
+    fetchProducts({
+      page: 1,
+      categoryFilters: [],
+      stockFilters: [],
+      minPrice: null,
+      maxPrice: null,
+      statusFilters: [],
+    });
+  };
+
   return (
     <aside className="hidden w-[210px] flex-shrink-0 xl:block">
       <div className="sticky top-[20px] rounded-lg border border-gray-200 bg-white p-4">
@@ -38,35 +112,32 @@ export default function ProductFilter() {
           <h3 className="text-[11px] font-bold uppercase tracking-[0.12em]">
             Filters
           </h3>
-          <button className="text-[10px] font-medium text-gray-400 transition-colors hover:text-black">
+          <button
+            onClick={clear}
+            className="text-[10px] font-medium text-gray-400 transition-colors hover:text-black"
+          >
             Clear All
           </button>
         </div>
 
         <FilterSection title="Category">
           <div className="space-y-2">
-            {[
-              { label: "Men", count: 62, checked: true },
-              { label: "Women", count: 48, checked: true },
-              { label: "Tops", count: 34 },
-              { label: "Bottoms", count: 22 },
-              { label: "Accessories", count: 12 },
-              { label: "Outerwear", count: 16 },
-            ].map((cat) => (
+            {categories.map((cat) => (
               <label
-                key={cat.label}
+                key={cat.id}
                 className="group flex cursor-pointer items-center gap-2"
               >
                 <input
                   type="checkbox"
-                  defaultChecked={cat.checked}
+                  checked={localCategories.includes(cat.name)}
+                  onChange={() => toggleCategory(cat.name)}
                   className="h-3.5 w-3.5 rounded accent-black"
                 />
                 <span className="text-[12px] text-gray-600 transition-colors group-hover:text-black">
-                  {cat.label}
+                  {cat.name}
                 </span>
                 <span className="ml-auto text-[10px] text-gray-300">
-                  {cat.count}
+                  {cat._count?.productCategories ?? 0}
                 </span>
               </label>
             ))}
@@ -75,18 +146,15 @@ export default function ProductFilter() {
 
         <FilterSection title="Stock Status">
           <div className="space-y-2">
-            {[
-              { label: "In Stock", color: "bg-emerald-500", checked: true },
-              { label: "Low Stock", color: "bg-amber-500", checked: true },
-              { label: "Out of Stock", color: "bg-red-500" },
-            ].map((status) => (
+            {STOCK_OPTIONS.map((status) => (
               <label
-                key={status.label}
+                key={status.value}
                 className="group flex cursor-pointer items-center gap-2"
               >
                 <input
                   type="checkbox"
-                  defaultChecked={status.checked}
+                  checked={localStock.includes(status.value)}
+                  onChange={() => toggleStock(status.value)}
                   className="h-3.5 w-3.5 rounded accent-black"
                 />
                 <span className="flex items-center gap-1.5 text-[12px] text-gray-600 transition-colors group-hover:text-black">
@@ -105,36 +173,42 @@ export default function ProductFilter() {
             type="range"
             min={0}
             max={500000}
-            defaultValue={500000}
+            step={10000}
+            value={localMaxPrice}
+            onChange={(e) => setLocalMaxPrice(Number(e.target.value))}
             className="mb-2 w-full"
           />
           <div className="flex items-center justify-between text-[10px] text-gray-400">
             <span>Rp 0</span>
-            <span>Rp 500K</span>
+            <span>Rp {(localMaxPrice / 1000).toFixed(0)}K</span>
           </div>
         </FilterSection>
 
         <FilterSection title="Status">
           <div className="space-y-2">
-            {["Published", "Draft"].map((status) => (
+            {STATUS_OPTIONS.map((status) => (
               <label
-                key={status}
+                key={status.value}
                 className="group flex cursor-pointer items-center gap-2"
               >
                 <input
                   type="checkbox"
-                  defaultChecked
+                  checked={localStatus.includes(status.value)}
+                  onChange={() => toggleStatus(status.value)}
                   className="h-3.5 w-3.5 rounded accent-black"
                 />
                 <span className="text-[12px] text-gray-600 transition-colors group-hover:text-black">
-                  {status}
+                  {status.label}
                 </span>
               </label>
             ))}
           </div>
         </FilterSection>
 
-        <button className="mt-2 w-full rounded-lg bg-black py-2.5 text-[11px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-gray-800">
+        <button
+          onClick={apply}
+          className="mt-2 w-full rounded-lg bg-black py-2.5 text-[11px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-gray-800"
+        >
           Apply Filters
         </button>
       </div>

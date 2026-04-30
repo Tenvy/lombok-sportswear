@@ -12,13 +12,12 @@ export async function GET(
       where: { slug },
       include: {
         productCategories: {
-          where: {
-            product: {
-              soldOut: false,
-            },
-          },
           include: {
-            product: true,
+            product: {
+              include: {
+                variants: true,
+              },
+            },
           },
         },
       },
@@ -31,21 +30,31 @@ export async function GET(
       );
     }
 
+    const products = category.productCategories
+      .map((pc) => pc.product)
+      .filter((p) => p !== null)
+      .filter((product) => {
+        const variants = product.variants || [];
+        return variants.some((v) => v.stock > 0);
+      })
+      .map((product) => {
+        const variants = product.variants || [];
+        const sizes = [...new Set(variants.map((v) => v.size).filter(Boolean))];
+        return {
+          ...product,
+          sizes,
+        };
+      });
+
     return NextResponse.json({
       id: category.id,
       name: category.name,
       slug: category.slug,
       createdAt: category.createdAt,
       updatedAt: category.updatedAt,
-      products: category.productCategories
-        .map((pc) => pc.product)
-        .filter((p) => p !== null)
-        .map((product) => ({
-          ...product,
-          sizes: product.sizes ? JSON.parse(product.sizes) : [],
-        })),
+      products,
       _count: {
-        products: category.productCategories.length,
+        products: products.length,
       },
     });
   } catch (error) {

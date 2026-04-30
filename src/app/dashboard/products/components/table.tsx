@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import {
   Search,
@@ -23,9 +23,11 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useProductStore } from "../../../../store/useProductStore";
 
 interface Product {
   id: string;
+  slug: string;
   name: string;
   sku: string;
   image: string;
@@ -37,6 +39,14 @@ interface Product {
   statusColor: string;
   statusIcon: React.ReactNode;
   outOfStock: boolean;
+  variants: Array<{
+    id: string;
+    color: string | null;
+    colorCode: string | null;
+    size: string | null;
+    stock: number;
+  }>;
+  images: string[];
 }
 
 function ProductCard({
@@ -120,6 +130,21 @@ function ProductCard({
   );
 }
 
+function getPageButtons(current: number, total: number): (number | string)[] {
+  if (total <= 0) return [];
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  const pages: (number | string)[] = [1];
+  if (current > 3) pages.push("...");
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+  for (let i = start; i <= end; i++) pages.push(i);
+  if (current < total - 2) pages.push("...");
+  pages.push(total);
+  return pages;
+}
+
 export default function ProductsTable({
   products,
 }: {
@@ -128,12 +153,40 @@ export default function ProductsTable({
   const [viewMode, setViewMode] = useState<"list" | "card">("list");
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [deleteProduct, setDeleteProduct] = useState<Product | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkAction, setBulkAction] = useState<string>("");
   const [showBulkConfirm, setShowBulkConfirm] = useState(false);
 
+  const {
+    page,
+    limit,
+    total,
+    totalPages,
+    search,
+    fetchProducts,
+    updateProduct,
+    deleteProduct: removeProduct,
+    bulkProducts,
+  } = useProductStore();
+
+  const [searchInput, setSearchInput] = useState(search);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchInput !== search) {
+        fetchProducts({ page: 1, limit, search: searchInput });
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput, search, limit]);
+
   const allSelected = products.length > 0 && selectedIds.size === products.length;
   const someSelected = selectedIds.size > 0 && !allSelected;
+
+  const start = total > 0 ? (page - 1) * limit + 1 : 0;
+  const end = Math.min(page * limit, total);
 
   const bulkConfig = {
     delete: { title: "Delete Products", desc: `Are you sure you want to delete ${selectedIds.size} selected products? This action cannot be undone.`, icon: Trash2, iconBg: "bg-red-50", iconColor: "text-red-500", btnLabel: "Delete", btnVariant: "destructive" as const },
@@ -168,6 +221,8 @@ export default function ProductsTable({
               <input
                 type="text"
                 placeholder="Search products..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-9 pr-3 text-[12px] transition-colors focus:border-gray-400 focus:bg-white focus:outline-none"
               />
             </div>
@@ -211,7 +266,7 @@ export default function ProductsTable({
           </div>
           <div className="flex items-center gap-2">
             <span className="whitespace-nowrap text-[11px] text-gray-400">
-              1–20 of 156
+              {start}–{end} of {total}
             </span>
             <div className="flex overflow-hidden rounded-lg border border-gray-200">
               <button
@@ -371,41 +426,64 @@ export default function ProductsTable({
         <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3">
           <div className="flex items-center gap-2">
             <span className="text-[11px] text-gray-400">Rows per page:</span>
-            <select className="rounded border border-gray-200 bg-white px-2 py-1 text-[11px] font-medium focus:border-gray-400 focus:outline-none">
-              <option>20</option>
-              <option>10</option>
-              <option>50</option>
+            <select
+              value={limit}
+              onChange={(e) => fetchProducts({ page: 1, limit: Number(e.target.value), search })}
+              className="rounded border border-gray-200 bg-white px-2 py-1 text-[11px] font-medium focus:border-gray-400 focus:outline-none"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
             </select>
           </div>
           <div className="flex items-center gap-1">
-            <button className="flex h-8 w-8 items-center justify-center rounded-md border border-gray-200 text-gray-400 transition-colors hover:border-gray-400 hover:text-black">
+            <button
+              onClick={() => fetchProducts({ page: page - 1, limit, search })}
+              disabled={page <= 1}
+              className={`flex h-8 w-8 items-center justify-center rounded-md border border-gray-200 text-gray-400 transition-colors hover:border-gray-400 hover:text-black ${page <= 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
               <ChevronLeft className="text-sm" />
             </button>
-            <button className="flex h-8 w-8 items-center justify-center rounded-md bg-black text-[11px] font-bold text-white">
-              1
-            </button>
-            {[2, 3, 4, 5].map((n) => (
-              <button
-                key={n}
-                className="flex h-8 w-8 items-center justify-center rounded-md border border-gray-200 text-[11px] font-medium text-gray-500 transition-colors hover:border-gray-400 hover:text-black"
-              >
-                {n}
-              </button>
-            ))}
-            <span className="px-0.5 text-[11px] text-gray-300">...</span>
-            <button className="flex h-8 w-8 items-center justify-center rounded-md border border-gray-200 text-[11px] font-medium text-gray-500 transition-colors hover:border-gray-400 hover:text-black">
-              8
-            </button>
-            <button className="flex h-8 w-8 items-center justify-center rounded-md border border-gray-200 text-gray-400 transition-colors hover:border-gray-400 hover:text-black">
+            {getPageButtons(page, totalPages).map((p, i) =>
+              p === "..." ? (
+                <span key={`dot-${i}`} className="px-0.5 text-[11px] text-gray-300">
+                  ...
+                </span>
+              ) : (
+                <button
+                  key={p}
+                  onClick={() => fetchProducts({ page: p as number, limit, search })}
+                  className={`flex h-8 w-8 items-center justify-center rounded-md text-[11px] font-medium transition-colors ${
+                    page === p
+                      ? "bg-black text-white"
+                      : "border border-gray-200 text-gray-500 hover:border-gray-400 hover:text-black"
+                  }`}
+                >
+                  {p}
+                </button>
+              )
+            )}
+            <button
+              onClick={() => fetchProducts({ page: page + 1, limit, search })}
+              disabled={page >= totalPages}
+              className={`flex h-8 w-8 items-center justify-center rounded-md border border-gray-200 text-gray-400 transition-colors hover:border-gray-400 hover:text-black ${page >= totalPages ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
               <ChevronRight className="text-sm" />
             </button>
             <div className="ml-3 flex items-center gap-1.5 border-l border-gray-200 pl-3">
               <span className="text-[11px] text-gray-400">Go to:</span>
               <input
                 type="number"
-                defaultValue={1}
                 min={1}
-                max={8}
+                max={totalPages}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const val = parseInt((e.target as HTMLInputElement).value, 10);
+                    if (!isNaN(val) && val >= 1 && val <= totalPages) {
+                      fetchProducts({ page: val, limit, search });
+                    }
+                  }
+                }}
                 className="w-12 rounded border border-gray-200 px-2 py-1 text-center text-[11px] font-medium focus:border-gray-400 focus:outline-none"
               />
             </div>
@@ -414,12 +492,14 @@ export default function ProductsTable({
       </div>
 
       <ProductEditModal
+        key={editProduct?.id || "new"}
         open={!!editProduct}
         product={editProduct ?? undefined}
         onClose={() => setEditProduct(null)}
+        onSubmit={updateProduct}
       />
 
-      <Dialog open={!!deleteProduct} onOpenChange={(open) => { if (!open) setDeleteProduct(null); }}>
+      <Dialog open={!!deleteProduct} onOpenChange={(open) => { if (!open) { setDeleteProduct(null); setDeleting(false); } }}>
         <DialogContent showCloseButton={false} className="sm:max-w-md">
           <DialogHeader>
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50">
@@ -433,11 +513,25 @@ export default function ProductsTable({
             </DialogDescription>
           </DialogHeader>
           <div className="flex items-center justify-center gap-2">
-            <DialogClose render={<Button variant="outline" size="sm" />}>
+            <DialogClose render={<Button variant="outline" size="sm" disabled={deleting} />}>
               Cancel
             </DialogClose>
-            <Button variant="destructive" size="sm" onClick={() => setDeleteProduct(null)}>
-              Delete
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={deleting}
+              onClick={async () => {
+                if (!deleteProduct) return;
+                setDeleting(true);
+                try {
+                  await removeProduct(deleteProduct.id);
+                  setDeleteProduct(null);
+                } finally {
+                  setDeleting(false);
+                }
+              }}
+            >
+              {deleting ? "Deleting..." : "Delete"}
             </Button>
           </div>
         </DialogContent>
@@ -467,7 +561,8 @@ export default function ProductsTable({
               <Button
                 variant={bulkConfig[bulkAction as keyof typeof bulkConfig].btnVariant}
                 size="sm"
-                onClick={() => {
+                onClick={async () => {
+                  await bulkProducts(bulkAction, Array.from(selectedIds));
                   setSelectedIds(new Set());
                   setBulkAction("");
                   setShowBulkConfirm(false);

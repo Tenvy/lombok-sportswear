@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   RefreshCw,
   UploadCloud,
@@ -35,29 +35,15 @@ export default function CategoryModal({
 }) {
   const isEdit = !!category;
 
-  const [formData, setFormData] = useState({
-    name: "",
-    slug: "",
-    parent: "No Parent (Top Level)",
-    status: "Active",
-    description: "",
+  const [formData, setFormData] = useState(() => ({
+    name: category?.name ?? "",
+    slug: category?.slug ?? "",
+    parent: category?.sub?.includes("Child of") ? "Men's Collection" : "No Parent (Top Level)",
+    status: category?.status ?? "Active",
+    description: category?.desc ?? "",
     metaDescription: "",
     metaKeywords: "",
-  });
-
-  useEffect(() => {
-    if (open) {
-      setFormData({
-        name: category?.name ?? "",
-        slug: category?.slug ?? "",
-        parent: category?.sub.includes("Child of") ? "Men's Collection" : "No Parent (Top Level)",
-        status: category?.status ?? "Active",
-        description: category?.desc ?? "",
-        metaDescription: "",
-        metaKeywords: "",
-      });
-    }
-  }, [open, category]);
+  }));
 
   const update = (key: keyof typeof formData, value: string) => {
     setFormData((prev) => ({ ...prev, [key]: value }));

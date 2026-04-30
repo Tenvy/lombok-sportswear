@@ -1,4 +1,4 @@
-import { PutObjectCommand, ListObjectsV2Command, DeleteObjectsCommand } from "@aws-sdk/client-s3"
+import { PutObjectCommand, ListObjectsV2Command, DeleteObjectsCommand, CopyObjectCommand } from "@aws-sdk/client-s3"
 import { r2 } from "./r2"
 
 export interface UploadToR2Params {
@@ -89,6 +89,24 @@ export async function deleteMultipleFromR2({ keys }: DeleteMultipleR2Params): Pr
   })
 
   await r2.send(command)
+}
+
+export async function copyInR2(sourceKey: string, destinationKey: string): Promise<string> {
+  const command = new CopyObjectCommand({
+    Bucket: process.env.R2_BUCKET_NAME,
+    CopySource: `${process.env.R2_BUCKET_NAME}/${sourceKey}`,
+    Key: destinationKey,
+  })
+
+  await r2.send(command)
+
+  return `${process.env.R2_PUBLIC_BASE_URL}/${destinationKey}`
+}
+
+export async function moveInR2(sourceKey: string, destinationKey: string): Promise<string> {
+  const url = await copyInR2(sourceKey, destinationKey)
+  await deleteFromR2({ key: sourceKey })
+  return url
 }
 
 export function extractR2KeyFromUrl(url: string): string | null {

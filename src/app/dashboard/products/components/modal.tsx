@@ -12,9 +12,11 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useCategoryStore } from "@/src/store/useCategoryStore";
 
 interface Product {
   id: string;
+  slug: string;
   name: string;
   sku: string;
   image: string;
@@ -26,6 +28,14 @@ interface Product {
   statusColor: string;
   statusIcon: React.ReactNode;
   outOfStock: boolean;
+  variants: Array<{
+    id: string;
+    color: string | null;
+    colorCode: string | null;
+    size: string | null;
+    stock: number;
+  }>;
+  images: string[];
 }
 
 const CategorySection = memo(({ allCategories, selectedCategories, onToggle }: {
@@ -56,35 +66,58 @@ const CategorySection = memo(({ allCategories, selectedCategories, onToggle }: {
 ));
 CategorySection.displayName = "CategorySection";
 
-const SizeVariantSection = memo(({ variants, onChange, onAdd, onRemove }: any) => (
+const VariantSection = memo(({ variants, onChange, onAdd, onRemove }: any) => (
   <div>
     <div className="mb-3 flex items-center justify-between">
       <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
-        Size Variants
+        Variants
       </label>
       <button onClick={onAdd} className="flex items-center gap-1 text-[11px] font-medium text-gray-400 transition-colors hover:text-black">
         <Plus className="size-3" />
-        Add Size
+        Add Variant
       </button>
     </div>
     <div className="space-y-2">
       {variants.map((variant: any, index: number) => (
-        <div key={variant.size} className="flex items-center gap-3 rounded-md border border-gray-100 px-3 py-2">
-          <input
-            type="checkbox"
-            checked={variant.enabled}
-            onChange={() => onChange(index, "enabled", !variant.enabled)}
-            className="h-3.5 w-3.5 rounded accent-black"
-          />
-          <span className="w-10 text-[12px] font-semibold">{variant.size}</span>
-          <span className="text-[11px] text-gray-400">Stock:</span>
-          <input
-            type="number"
-            value={variant.stock}
-            onChange={(e) => onChange(index, "stock", e.target.value)}
-            className="w-16 rounded border border-gray-200 px-2 py-1 text-center text-[12px] focus:border-gray-400 focus:outline-none"
-          />
-          <button onClick={() => onRemove(index)} className="ml-auto text-gray-300 transition-colors hover:text-red-500">
+        <div key={index} className="flex items-center gap-3 rounded-md border border-gray-100 px-3 py-2">
+          <div className="flex-[1.2]">
+            <label className="block text-[10px] font-medium text-gray-400">Color</label>
+            <input
+              type="text"
+              value={variant.color}
+              onChange={(e) => onChange(index, "color", e.target.value)}
+              className="w-full rounded border border-gray-200 px-2 py-1 text-[12px] focus:border-gray-400 focus:outline-none"
+            />
+          </div>
+          <div className="w-24">
+            <label className="block text-[10px] font-medium text-gray-400">Hex</label>
+            <input
+              type="text"
+              value={variant.colorCode || ""}
+              onChange={(e) => onChange(index, "colorCode", e.target.value)}
+              placeholder="#000000"
+              className="w-full rounded border border-gray-200 px-2 py-1 text-[12px] focus:border-gray-400 focus:outline-none"
+            />
+          </div>
+          <div className="flex-1">
+            <label className="block text-[10px] font-medium text-gray-400">Size</label>
+            <input
+              type="text"
+              value={variant.size}
+              onChange={(e) => onChange(index, "size", e.target.value)}
+              className="w-full rounded border border-gray-200 px-2 py-1 text-[12px] focus:border-gray-400 focus:outline-none"
+            />
+          </div>
+          <div className="w-20">
+            <label className="block text-[10px] font-medium text-gray-400">Stock</label>
+            <input
+              type="number"
+              value={variant.stock}
+              onChange={(e) => onChange(index, "stock", e.target.value)}
+              className="w-full rounded border border-gray-200 px-2 py-1 text-center text-[12px] focus:border-gray-400 focus:outline-none"
+            />
+          </div>
+          <button onClick={() => onRemove(index)} className="mt-4 text-gray-300 transition-colors hover:text-red-500">
             <Trash2 className="size-3.5" />
           </button>
         </div>
@@ -92,149 +125,163 @@ const SizeVariantSection = memo(({ variants, onChange, onAdd, onRemove }: any) =
     </div>
   </div>
 ));
-SizeVariantSection.displayName = "SizeVariantSection";
-
-const ColorVariantSection = memo(({ variants, onChange, onAdd, onRemove }: any) => (
-  <div>
-    <div className="mb-3 flex items-center justify-between">
-      <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
-        Color Variants
-      </label>
-      <button onClick={onAdd} className="flex items-center gap-1 text-[11px] font-medium text-gray-400 transition-colors hover:text-black">
-        <Plus className="size-3" />
-        Add Color
-      </button>
-    </div>
-    <div className="space-y-2">
-      {variants.map((color: any, index: number) => (
-        <div key={color.name} className="flex items-center gap-3 rounded-md border border-gray-100 px-3 py-2">
-          <input
-            type="checkbox"
-            checked={color.enabled}
-            onChange={() => onChange(index, "enabled", !color.enabled)}
-            className="h-3.5 w-3.5 rounded accent-black"
-          />
-          <span className="h-5 w-5 rounded-full border border-gray-200" style={{ backgroundColor: color.hex }} />
-          <input
-            type="text"
-            value={color.name}
-            onChange={(e) => onChange(index, "name", e.target.value)}
-            className="w-24 rounded border border-gray-200 px-2 py-1 text-[12px] focus:border-gray-400 focus:outline-none"
-          />
-          <input
-            type="text"
-            value={color.hex}
-            onChange={(e) => onChange(index, "hex", e.target.value)}
-            className="w-20 rounded border border-gray-200 px-2 py-1 text-[12px] focus:border-gray-400 focus:outline-none"
-          />
-          <button onClick={() => onRemove(index)} className="ml-auto text-gray-300 transition-colors hover:text-red-500">
-            <Trash2 className="size-3.5" />
-          </button>
-        </div>
-      ))}
-    </div>
-  </div>
-));
-ColorVariantSection.displayName = "ColorVariantSection";
+VariantSection.displayName = "VariantSection";
 
 export default function ProductEditModal({
   open,
   product,
   onClose,
+  onSubmit,
 }: {
   open: boolean;
   product?: Product;
   onClose: () => void;
+  onSubmit?: (payload: any) => Promise<void>;
 }) {
-  const allCategories = [
-    "Men", "Women", "Tops", "Bottoms", "Outerwear", "Hoodie", "Jacket",
-    "Pants", "T-Shirt", "Polo", "Accessories",
-  ];
+  const { categories, fetchCategories } = useCategoryStore();
+  const allCategories = categories.map((c) => c.name);
+
+  useEffect(() => {
+    if (open) fetchCategories();
+  }, [open, fetchCategories]);
 
   const isEdit = !!product;
 
   const [formData, setFormData] = useState({
-    name: "",
-    sku: "",
-    price: "",
-    categories: [] as string[],
-    stock: "0",
-    status: "Draft",
+    name: product?.name ?? "",
+    sku: product?.sku ?? "",
+    price: product?.price.replace("Rp ", "").replace(/\./g, "") ?? "",
+    categories: (product?.categories ?? []).map((c) => c.name),
+    status: product?.status ?? "Draft",
     description: "",
   });
+  const [variants, setVariants] = useState<Array<{ id?: string; color: string; colorCode: string; size: string; stock: string }>>(
+    product?.id
+      ? (product.variants?.map((v) => ({
+          id: v.id,
+          color: v.color ?? "",
+          colorCode: v.colorCode ?? "#000000",
+          size: v.size ?? "",
+          stock: String(v.stock ?? 0),
+        })) ?? [])
+      : [
+          { color: "Black", colorCode: "#000000", size: "S", stock: "12" },
+          { color: "Black", colorCode: "#000000", size: "M", stock: "18" },
+          { color: "White", colorCode: "#FFFFFF", size: "S", stock: "8" },
+          { color: "White", colorCode: "#FFFFFF", size: "L", stock: "4" },
+        ]
+  );
+  const [imageUrl, setImageUrl] = useState(product?.image ?? "");
+  const [galleryImages, setGalleryImages] = useState(product?.images ?? []);
+  const [uploading, setUploading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const [sizeVariants, setSizeVariants] = useState([
-    { size: "S", stock: "12", enabled: true },
-    { size: "M", stock: "18", enabled: true },
-    { size: "L", stock: "14", enabled: true },
-    { size: "XL", stock: "8", enabled: true },
-    { size: "2XL", stock: "4", enabled: false },
-  ]);
-
-  const [colorVariants, setColorVariants] = useState([
-    { name: "Black", hex: "#000000", enabled: true },
-    { name: "White", hex: "#FFFFFF", enabled: true },
-    { name: "Gray", hex: "#6B7280", enabled: false },
-  ]);
+  const totalStock = variants.reduce((sum, v) => sum + (parseInt(v.stock, 10) || 0), 0);
 
   useEffect(() => {
-    if (open) {
-      setFormData({
-        name: product?.name ?? "",
-        sku: product?.sku ?? "",
-        price: product?.price.replace("Rp ", "").replace(/\./g, "") ?? "",
-        categories: (product?.categories ?? []).map((c) => c.name),
-        stock: product?.stock.toString() ?? "0",
-        status: product?.status ?? "Draft",
-        description: "",
-      });
-    }
-  }, [open, product]);
+    if (open) fetchCategories();
+  }, [open, fetchCategories]);
 
-  const updateField = useCallback((field: keyof typeof formData, value: any) => {
+  const updateField = (field: keyof typeof formData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  }, []);
+  };
 
-  const toggleCategory = useCallback((cat: string) => {
+  const toggleCategory = (cat: string) => {
     setFormData((prev) => ({
       ...prev,
       categories: prev.categories.includes(cat)
         ? prev.categories.filter((c) => c !== cat)
         : [...prev.categories, cat],
     }));
-  }, []);
+  };
 
-  const updateSizeVariant = useCallback((index: number, field: string, value: any) => {
-    setSizeVariants((prev) => {
+  const updateVariant = (index: number, field: string, value: any) => {
+    setVariants((prev) => {
       const next = [...prev];
       next[index] = { ...next[index], [field]: value };
       return next;
     });
-  }, []);
+  };
 
-  const addSizeVariant = useCallback(() => {
-    setSizeVariants((prev) => [...prev, { size: "New", stock: "0", enabled: true }]);
-  }, []);
+  const addVariant = () => {
+    setVariants((prev) => [...prev, { color: "", colorCode: "#000000", size: "", stock: "0" }]);
+  };
 
-  const removeSizeVariant = useCallback((index: number) => {
-    setSizeVariants((prev) => prev.filter((_, i) => i !== index));
-  }, []);
+  const removeVariant = (index: number) => {
+    setVariants((prev) => prev.filter((_, i) => i !== index));
+  };
 
-  const updateColorVariant = useCallback((index: number, field: string, value: any) => {
-    setColorVariants((prev) => {
-      const next = [...prev];
-      next[index] = { ...next[index], [field]: value };
-      return next;
-    });
-  }, []);
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (data.url) setImageUrl(data.url);
+    } catch (err) {
+      console.error("Upload failed", err);
+    } finally {
+      setUploading(false);
+    }
+  };
 
-  const addColorVariant = useCallback(() => {
-    setColorVariants((prev) => [...prev, { name: "New Color", hex: "#000000", enabled: true }]);
-  }, []);
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    setUploading(true);
+    try {
+      const urls = await Promise.all(
+        files.map(async (file) => {
+          const formData = new FormData();
+          formData.append("file", file);
+          const res = await fetch("/api/upload", { method: "POST", body: formData });
+          const data = await res.json();
+          return data.url as string;
+        })
+      );
+      setGalleryImages((prev) => [...prev, ...urls.filter(Boolean)]);
+    } catch (err) {
+      console.error("Gallery upload failed", err);
+    } finally {
+      setUploading(false);
+    }
+  };
 
-  const removeColorVariant = useCallback((index: number) => {
-    setColorVariants((prev) => prev.filter((_, i) => i !== index));
-  }, []);
+  const removeGalleryImage = (index: number) => {
+    setGalleryImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = useCallback(async () => {
+    if (!onSubmit) return;
+    setSubmitting(true);
+    try {
+      const payload = {
+        ...(isEdit && product ? { id: product.id } : {}),
+        name: formData.name,
+        slug: formData.sku || formData.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
+        description: formData.description,
+        price: formData.price,
+        image: imageUrl || "https://placehold.co/400x400?text=No+Image",
+        images: galleryImages,
+        status: formData.status,
+        categoryNames: formData.categories,
+        variants: variants.map((v) => ({
+          ...(v.id ? { id: v.id } : {}),
+          color: v.color,
+          colorCode: v.colorCode,
+          size: v.size,
+          stock: v.stock,
+        })),
+      };
+      await onSubmit(payload);
+      onClose();
+    } finally {
+      setSubmitting(false);
+    }
+  }, [onSubmit, formData, imageUrl, galleryImages, variants, onClose, isEdit, product]);
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
@@ -273,6 +320,7 @@ export default function ProductEditModal({
                 type="text"
                 value={formData.sku}
                 onChange={(e) => updateField("sku", e.target.value)}
+                placeholder="product-slug"
                 className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
               />
             </div>
@@ -289,7 +337,9 @@ export default function ProductEditModal({
                   Price (Rp)
                 </label>
                 <input
-                  type="text"
+                  type="number"
+                  min={0}
+                  step={1}
                   value={formData.price}
                   onChange={(e) => updateField("price", e.target.value)}
                   className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
@@ -301,9 +351,9 @@ export default function ProductEditModal({
                 </label>
                 <input
                   type="number"
-                  value={formData.stock}
-                  onChange={(e) => updateField("stock", e.target.value)}
-                  className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
+                  value={totalStock}
+                  readOnly
+                  className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-[13px] text-gray-500 focus:outline-none"
                 />
               </div>
               <div>
@@ -317,7 +367,6 @@ export default function ProductEditModal({
                 >
                   <option>Published</option>
                   <option>Draft</option>
-                  <option>Out of Stock</option>
                 </select>
               </div>
             </div>
@@ -335,18 +384,11 @@ export default function ProductEditModal({
               />
             </div>
 
-            <SizeVariantSection
-              variants={sizeVariants}
-              onChange={updateSizeVariant}
-              onAdd={addSizeVariant}
-              onRemove={removeSizeVariant}
-            />
-
-            <ColorVariantSection
-              variants={colorVariants}
-              onChange={updateColorVariant}
-              onAdd={addColorVariant}
-              onRemove={removeColorVariant}
+            <VariantSection
+              variants={variants}
+              onChange={updateVariant}
+              onAdd={addVariant}
+              onRemove={removeVariant}
             />
           </div>
 
@@ -356,10 +398,10 @@ export default function ProductEditModal({
                 Product Image
               </label>
               <div className="group relative aspect-square overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
-                {product ? (
+                {imageUrl ? (
                   <Image
-                    src={product.image}
-                    alt={product.name}
+                    src={imageUrl}
+                    alt={formData.name || "Product"}
                     fill
                     sizes="300px"
                     className="h-full w-full object-cover"
@@ -370,12 +412,22 @@ export default function ProductEditModal({
                   </div>
                 )}
                 <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition-opacity group-hover:opacity-100">
-                  <button className="flex items-center gap-1.5 rounded-md bg-white px-3 py-2 text-[11px] font-semibold">
+                  <label className="flex cursor-pointer items-center gap-1.5 rounded-md bg-white px-3 py-2 text-[11px] font-semibold">
                     <Upload className="size-3" />
-                    {product ? "Change" : "Upload"}
-                  </button>
+                    {imageUrl ? "Change" : "Upload"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageUpload}
+                      disabled={uploading}
+                    />
+                  </label>
                 </div>
               </div>
+              {uploading && (
+                <p className="mt-1 text-[10px] text-gray-400">Uploading...</p>
+              )}
             </div>
 
             <div>
@@ -383,10 +435,38 @@ export default function ProductEditModal({
                 Gallery Images
               </label>
               <div className="grid grid-cols-3 gap-2">
-                <div className="flex aspect-square items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50 text-gray-300 transition-colors hover:border-gray-400 hover:text-gray-400">
+                {galleryImages.map((url, index) => (
+                  <div key={url + index} className="group relative aspect-square overflow-hidden rounded-md border border-gray-200 bg-gray-100">
+                    <Image
+                      src={url}
+                      alt={`Gallery ${index + 1}`}
+                      fill
+                      sizes="100px"
+                      className="h-full w-full object-cover"
+                    />
+                    <button
+                      onClick={() => removeGalleryImage(index)}
+                      className="absolute right-1 top-1 rounded bg-black/50 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                    >
+                      <Trash2 className="size-3" />
+                    </button>
+                  </div>
+                ))}
+                <label className="flex aspect-square cursor-pointer items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50 text-gray-300 transition-colors hover:border-gray-400 hover:text-gray-400">
                   <Plus className="size-5" />
-                </div>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleGalleryUpload}
+                    disabled={uploading}
+                  />
+                </label>
               </div>
+              {uploading && (
+                <p className="mt-1 text-[10px] text-gray-400">Uploading...</p>
+              )}
               <p className="mt-2 text-[10px] text-gray-400">
                 Upload additional product images.
               </p>
@@ -405,13 +485,17 @@ export default function ProductEditModal({
                 )}
                 <div className="flex items-center justify-between text-[11px]">
                   <span className="text-gray-400">Status</span>
-                  <span className={`font-semibold ${formData.status === "Out of Stock" ? "text-red-500" : formData.status === "Published" ? "text-emerald-600" : "text-gray-500"}`}>
+                  <span className={`font-semibold ${formData.status === "Published" ? "text-emerald-600" : "text-gray-500"}`}>
                     {formData.status}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-[11px]">
                   <span className="text-gray-400">Total Stock</span>
-                  <span className="font-semibold">{formData.stock}</span>
+                  <span className="font-semibold">{totalStock}</span>
+                </div>
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-gray-400">Variants</span>
+                  <span className="font-semibold">{variants.length}</span>
                 </div>
                 <div className="flex items-center justify-between text-[11px]">
                   <span className="text-gray-400">Price</span>
@@ -426,8 +510,8 @@ export default function ProductEditModal({
           <DialogClose render={<Button variant="outline" size="sm" />}>
             Cancel
           </DialogClose>
-          <Button size="sm" onClick={onClose}>
-            {isEdit ? "Save Changes" : "Create Product"}
+          <Button size="sm" onClick={handleSubmit} disabled={uploading || submitting || !formData.name || !formData.price}>
+            {submitting ? (isEdit ? "Saving..." : "Creating...") : (isEdit ? "Save Changes" : "Create Product")}
           </Button>
         </div>
       </DialogContent>

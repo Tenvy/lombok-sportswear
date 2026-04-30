@@ -247,6 +247,7 @@ export default function OrdersTable({
       />
 
       <OrderEditModal
+        key={editOrder?.id || "new"}
         open={!!editOrder}
         order={editOrder}
         onClose={() => setEditOrder(null)}

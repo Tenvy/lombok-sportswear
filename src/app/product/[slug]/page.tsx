@@ -57,21 +57,17 @@ export default function ProductPage() {
     fetchProduct(productSlug);
   }, [productSlug, fetchProduct]);
 
-  useEffect(() => {
-    if (product?.sizes && product.sizes.length > 0) {
-      setSelectedSize(product.sizes[0]);
-    }
-  }, [product]);
+  const effectiveSize = selectedSize || product?.sizes?.[0] || "";
 
   const handleAddToCart = () => {
-    if (!product || !selectedSize) return;
+    if (!product || !effectiveSize) return;
 
     addToCart({
-      id: `${product.slug}-${selectedSize}-${selectedColor}-${selectedService?.name || "plain"}`,
+      id: `${product.slug}-${effectiveSize}-${selectedColor}-${selectedService?.name || "plain"}`,
       name: product.name,
       price: product.price,
       quantity: quantity,
-      size: selectedSize,
+      size: effectiveSize,
       image: product.image,
       customization: selectedService ? {
         serviceName: selectedService.name,
@@ -255,7 +251,7 @@ export default function ProductPage() {
                       onClick={() => setSelectedSize(size)}
                       disabled={product.soldOut}
                       className={`flex h-12 items-center justify-center border text-xs font-bold transition-all ${
-                        selectedSize === size
+                        effectiveSize === size
                           ? "border-black bg-black text-white"
                           : "border-gray-200 text-gray-900 hover:border-black"
                       } ${product.soldOut ? "opacity-50 cursor-not-allowed" : ""}`}
@@ -292,7 +288,7 @@ export default function ProductPage() {
                 <div className="flex gap-3 pt-4">
                    <button
                     onClick={handleAddToCart}
-                    disabled={product.soldOut || !selectedSize}
+                    disabled={product.soldOut || !effectiveSize}
                     className="flex flex-[4] items-center justify-center gap-3 bg-black h-14 text-xs font-bold uppercase tracking-widest text-white transition-all hover:bg-gray-900 disabled:bg-gray-300 disabled:cursor-not-allowed"
                   >
                     <ShoppingBag className="size-4" />

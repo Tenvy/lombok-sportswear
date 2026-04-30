@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import { 
   Search, 
@@ -94,8 +94,11 @@ export default function POSPage() {
     }
   };
 
+  const cartIdRef = useRef(0);
+
   const addToCart = (product: typeof products[0], service?: typeof customServices[0]) => {
-    const cartId = `${product.id}-${service?.id || "plain"}-${Date.now()}`;
+    cartIdRef.current += 1;
+    const cartId = `${product.id}-${service?.id || "plain"}-${cartIdRef.current}`;
     const newItem: CartItem = {
       cartId,
       id: product.id,

@@ -66,16 +66,12 @@ interface SearchNavbarProps {
 
 export default function SearchNavbar({ isOpen, onClose }: SearchNavbarProps) {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<Product[]>([]);
+  const [fetchedResults, setFetchedResults] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Dynamic Search Effect
   useEffect(() => {
-    if (!query.trim()) {
-      setResults([]);
-      return;
-    }
+    if (!query.trim()) return;
 
     const timer = setTimeout(async () => {
       setLoading(true);
@@ -83,7 +79,7 @@ export default function SearchNavbar({ isOpen, onClose }: SearchNavbarProps) {
         const res = await fetch(`/api/products?query=${encodeURIComponent(query)}`);
         if (res.ok) {
           const data = await res.json();
-          setResults(data);
+          setFetchedResults(data);
         }
       } catch (err) {
         console.error("Search error:", err);
@@ -95,12 +91,7 @@ export default function SearchNavbar({ isOpen, onClose }: SearchNavbarProps) {
     return () => clearTimeout(timer);
   }, [query]);
 
-  useEffect(() => {
-    if (isOpen) {
-      setQuery("");
-      setTimeout(() => inputRef.current?.focus(), 100);
-    }
-  }, [isOpen]);
+  const results = query.trim() ? fetchedResults : [];
 
   if (!isOpen) return null;
 
@@ -112,6 +103,7 @@ export default function SearchNavbar({ isOpen, onClose }: SearchNavbarProps) {
             <Search className="size-[18px] shrink-0 text-gray-400" />
             <input
               ref={inputRef}
+              autoFocus
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}

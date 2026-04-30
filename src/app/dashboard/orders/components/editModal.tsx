@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -42,21 +42,11 @@ export default function OrderEditModal({
   order: Order | null;
   onClose: () => void;
 }) {
-  const [formData, setFormData] = useState({
-    status: "",
-    payment: "",
+  const [formData, setFormData] = useState(() => ({
+    status: order?.status ?? "",
+    payment: order?.payment ?? "",
     notes: "",
-  });
-
-  useEffect(() => {
-    if (open && order) {
-      setFormData({
-        status: order.status,
-        payment: order.payment,
-        notes: "",
-      });
-    }
-  }, [open, order]);
+  }));
 
   if (!order) return null;
 

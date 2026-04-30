@@ -8,7 +8,6 @@ import {
   XCircle,
   CircleCheck,
   CircleX,
-  CircleDashed,
   Plus,
 } from "lucide-react";
 import ProductsTable from "./table";
@@ -16,31 +15,110 @@ import ProductFilter from "./filter";
 import ProductEditModal from "./modal";
 import ExportModal from "./exportModal";
 import { useState } from "react";
+import { useProductStore } from "../../../../store/useProductStore";
 
-const products = [
-  { id: "prod-1", name: "Lombok Classic Polo", sku: "LMB-PLO-001", image: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=80&h=80&fit=crop", categories: [{ name: "Men", color: "bg-gray-100 text-gray-600" }, { name: "T-Shirt", color: "bg-blue-50 text-blue-600" }], price: "Rp 289.000", stock: 54, stockColor: "text-emerald-600", status: "Published", statusColor: "text-emerald-700 bg-emerald-50", statusIcon: <CircleCheck className="text-[10px]" />, outOfStock: false },
-  { id: "prod-2", name: "Sport Zip Jacket", sku: "LMB-JKT-002", image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=80&h=80&fit=crop", categories: [{ name: "Men", color: "bg-gray-100 text-gray-600" }, { name: "Outerwear", color: "bg-gray-100 text-gray-600" }], price: "Rp 459.000", stock: 32, stockColor: "text-emerald-600", status: "Published", statusColor: "text-emerald-700 bg-emerald-50", statusIcon: <CircleCheck className="text-[10px]" />, outOfStock: false },
-  { id: "prod-3", name: "Essential Hoodie Black", sku: "LMB-HOD-003", image: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=80&h=80&fit=crop", categories: [{ name: "Men", color: "bg-gray-100 text-gray-600" }, { name: "Hoodie", color: "bg-purple-50 text-purple-600" }], price: "Rp 389.000", stock: 7, stockColor: "text-amber-500", status: "Published", statusColor: "text-emerald-700 bg-emerald-50", statusIcon: <CircleCheck className="text-[10px]" />, outOfStock: false },
-  { id: "prod-4", name: "Wide Leg Trousers", sku: "LMB-PNT-004", image: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=80&h=80&fit=crop", categories: [{ name: "Bottoms", color: "bg-gray-100 text-gray-600" }, { name: "Pants", color: "bg-teal-50 text-teal-600" }], price: "Rp 349.000", stock: 28, stockColor: "text-emerald-600", status: "Published", statusColor: "text-emerald-700 bg-emerald-50", statusIcon: <CircleCheck className="text-[10px]" />, outOfStock: false },
-  { id: "prod-5", name: "Sport Bra Impact", sku: "LMB-WBR-005", image: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=80&h=80&fit=crop", categories: [{ name: "Women", color: "bg-pink-50 text-pink-600" }, { name: "Tops", color: "bg-blue-50 text-blue-600" }], price: "Rp 249.000", stock: 5, stockColor: "text-amber-500", status: "Published", statusColor: "text-emerald-700 bg-emerald-50", statusIcon: <CircleCheck className="text-[10px]" />, outOfStock: false },
-  { id: "prod-6", name: "Pullover Hoodie Gray", sku: "LMB-HOD-006", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=80&h=80&fit=crop", categories: [{ name: "Men", color: "bg-gray-100 text-gray-600" }, { name: "Hoodie", color: "bg-purple-50 text-purple-600" }], price: "Rp 369.000", stock: 0, stockColor: "text-red-500", status: "Out of Stock", statusColor: "text-red-600 bg-red-50", statusIcon: <CircleX className="text-[10px]" />, outOfStock: true },
-  { id: "prod-7", name: "Track Jacket Pro", sku: "LMB-JKT-007", image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=80&h=80&fit=crop", categories: [{ name: "Outerwear", color: "bg-gray-100 text-gray-600" }, { name: "Jacket", color: "bg-indigo-50 text-indigo-600" }], price: "Rp 489.000", stock: 19, stockColor: "text-emerald-600", status: "Published", statusColor: "text-emerald-700 bg-emerald-50", statusIcon: <CircleCheck className="text-[10px]" />, outOfStock: false },
-  { id: "prod-8", name: "High-Rise Leggings", sku: "LMB-WLG-008", image: "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=80&h=80&fit=crop", categories: [{ name: "Women", color: "bg-pink-50 text-pink-600" }, { name: "Bottoms", color: "bg-gray-100 text-gray-600" }], price: "Rp 319.000", stock: 45, stockColor: "text-emerald-600", status: "Draft", statusColor: "text-gray-500 bg-gray-100", statusIcon: <CircleDashed className="text-[10px]" />, outOfStock: false },
-  { id: "prod-9", name: "Slim Jogger Pants", sku: "LMB-PNT-009", image: "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=80&h=80&fit=crop", categories: [{ name: "Bottoms", color: "bg-gray-100 text-gray-600" }, { name: "Pants", color: "bg-teal-50 text-teal-600" }], price: "Rp 329.000", stock: 8, stockColor: "text-amber-500", status: "Published", statusColor: "text-emerald-700 bg-emerald-50", statusIcon: <CircleCheck className="text-[10px]" />, outOfStock: false },
-  { id: "prod-10", name: "Leather Woven Belt", sku: "LMB-ACC-010", image: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=80&h=80&fit=crop", categories: [{ name: "Accessories", color: "bg-amber-50 text-amber-600" }], price: "Rp 179.000", stock: 0, stockColor: "text-red-500", status: "Out of Stock", statusColor: "text-red-600 bg-red-50", statusIcon: <CircleX className="text-[10px]" />, outOfStock: true },
-  { id: "prod-11", name: "Zip Hoodie Essential", sku: "LMB-HOD-011", image: "https://placehold.co/80x80/1a1a1a/888?text=Image", categories: [{ name: "Men", color: "bg-gray-100 text-gray-600" }, { name: "Hoodie", color: "bg-purple-50 text-purple-600" }], price: "Rp 419.000", stock: 22, stockColor: "text-emerald-600", status: "Published", statusColor: "text-emerald-700 bg-emerald-50", statusIcon: <CircleCheck className="text-[10px]" />, outOfStock: false },
-  { id: "prod-12", name: "Performance Tank", sku: "LMB-WTK-012", image: "https://placehold.co/80x80/1a1a1a/888?text=Image", categories: [{ name: "Women", color: "bg-pink-50 text-pink-600" }, { name: "Tops", color: "bg-blue-50 text-blue-600" }], price: "Rp 179.000", stock: 61, stockColor: "text-emerald-600", status: "Draft", statusColor: "text-gray-500 bg-gray-100", statusIcon: <CircleDashed className="text-[10px]" />, outOfStock: false },
-];
+interface StoreProduct {
+  id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  price: number;
+  image: string;
+  images: string[];
+  soldOut: boolean;
+  stock: number;
+  status: string;
+  sizes: string[];
+  variants: Array<{
+    id: string;
+    color: string | null;
+    colorCode: string | null;
+    size: string | null;
+    stock: number;
+  }>;
+  categories: Array<{ id: string; name: string; slug: string }>;
+}
 
-export default function ProductsContent() {
+const categoryColorMap: Record<string, string> = {
+  Men: "bg-gray-100 text-gray-600",
+  Women: "bg-pink-50 text-pink-600",
+  Tops: "bg-blue-50 text-blue-600",
+  Bottoms: "bg-gray-100 text-gray-600",
+  Outerwear: "bg-gray-100 text-gray-600",
+  Hoodie: "bg-purple-50 text-purple-600",
+  Jacket: "bg-indigo-50 text-indigo-600",
+  Pants: "bg-teal-50 text-teal-600",
+  "T-Shirt": "bg-blue-50 text-blue-600",
+  Polo: "bg-gray-100 text-gray-600",
+  Accessories: "bg-amber-50 text-amber-600",
+};
+
+function mapToDisplayProduct(p: StoreProduct) {
+  const stock = p.stock;
+  let status: string;
+  let statusColor: string;
+  let statusIcon: React.ReactNode;
+
+  if (stock === 0) {
+    status = "Out of Stock";
+    statusColor = "text-red-600 bg-red-50";
+    statusIcon = <CircleX className="text-[10px]" />;
+  } else if (p.status === "DRAFT") {
+    status = "Draft";
+    statusColor = "text-gray-600 bg-gray-100";
+    statusIcon = <CircleCheck className="text-[10px]" />;
+  } else {
+    status = "Published";
+    statusColor = "text-emerald-700 bg-emerald-50";
+    statusIcon = <CircleCheck className="text-[10px]" />;
+  }
+
+  const stockColor =
+    stock === 0 ? "text-red-500" : stock <= 10 ? "text-amber-500" : "text-emerald-600";
+
+  return {
+    id: p.id,
+    slug: p.slug,
+    name: p.name,
+    sku: p.slug.toUpperCase(),
+    image: p.image,
+    categories: p.categories.map((c) => ({
+      name: c.name,
+      color: categoryColorMap[c.name] || "bg-gray-100 text-gray-600",
+    })),
+    price: `Rp ${p.price.toLocaleString("id-ID")}`,
+    stock,
+    stockColor,
+    status,
+    statusColor,
+    statusIcon,
+    outOfStock: stock === 0,
+    variants: p.variants,
+    images: p.images,
+  };
+}
+
+export default function ProductsContent({
+  products,
+  loading,
+  error,
+}: {
+  products: StoreProduct[];
+  loading: boolean;
+  error: string | null;
+}) {
+  const { total, createProduct } = useProductStore();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+
+  const displayProducts = products.map(mapToDisplayProduct);
 
   return (
     <div className="flex-1 p-6">
       <ProductEditModal
         open={showCreateModal}
         onClose={() => setShowCreateModal(false)}
+        onSubmit={createProduct}
       />
       <ExportModal
         open={showExportModal}
@@ -79,7 +157,7 @@ export default function ProductsContent() {
             </span>
             <Package className="text-lg text-gray-300" />
           </div>
-          <p className="text-2xl font-bold tracking-tight">156</p>
+          <p className="text-2xl font-bold tracking-tight">{total}</p>
           <p className="mt-1 text-[11px] font-medium text-emerald-600">
             +8 this month
           </p>
@@ -91,9 +169,13 @@ export default function ProductsContent() {
             </span>
             <CheckCircle className="text-lg text-gray-300" />
           </div>
-          <p className="text-2xl font-bold tracking-tight">138</p>
+          <p className="text-2xl font-bold tracking-tight">
+            {displayProducts.filter((p) => p.status === "Published").length}
+          </p>
           <p className="mt-1 text-[11px] font-medium text-gray-400">
-            88.5% of total
+            {products.length
+              ? `${((displayProducts.filter((p) => p.status === "Published").length / products.length) * 100).toFixed(1)}% of total`
+              : "0% of total"}
           </p>
         </div>
         <div className="rounded-lg border border-gray-200 bg-white p-4">
@@ -104,7 +186,7 @@ export default function ProductsContent() {
             <AlertTriangle className="text-lg text-gray-300" />
           </div>
           <p className="text-2xl font-bold tracking-tight text-amber-600">
-            12
+            {displayProducts.filter((p) => p.stock > 0 && p.stock <= 10).length}
           </p>
           <p className="mt-1 text-[11px] font-medium text-amber-600">
             Needs restock
@@ -117,16 +199,29 @@ export default function ProductsContent() {
             </span>
             <XCircle className="text-lg text-gray-300" />
           </div>
-          <p className="text-2xl font-bold tracking-tight text-red-500">3</p>
+          <p className="text-2xl font-bold tracking-tight text-red-500">
+            {displayProducts.filter((p) => p.outOfStock).length}
+          </p>
           <p className="mt-1 text-[11px] font-medium text-red-500">
             Action required
           </p>
         </div>
       </div>
 
+      {loading && (
+        <div className="mb-4 rounded-lg border border-gray-200 bg-white p-4 text-center text-[12px] text-gray-400">
+          Loading products...
+        </div>
+      )}
+      {error && (
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-center text-[12px] text-red-500">
+          {error}
+        </div>
+      )}
+
       <div className="flex gap-4">
         <div className="min-w-0 flex-1">
-          <ProductsTable products={products} />
+          <ProductsTable products={displayProducts} />
         </div>
 
         <ProductFilter />
