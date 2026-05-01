@@ -10,7 +10,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { PencilSimple } from "@phosphor-icons/react";
 
 interface Order {
   id: string;
@@ -57,11 +57,11 @@ export default function OrderEditModal({
         className="top-[5%] max-h-[90vh] -translate-y-0 sm:max-w-lg overflow-y-auto rounded-lg p-0"
       >
         <DialogHeader className="border-b border-gray-200 px-6 py-4">
-          <DialogTitle className="flex items-center gap-2 text-[14px] font-bold tracking-tight">
-            <Pencil className="size-4" />
+          <DialogTitle className="flex items-center gap-2 text-base font-bold tracking-tight">
+            <PencilSimple size={16} />
             Edit Order {order.id}
           </DialogTitle>
-          <DialogDescription className="mt-0.5 text-[11px] text-gray-400">
+          <DialogDescription className="mt-0.5 text-[13px] text-gray-400">
             Update order status, payment, and customer details.
           </DialogDescription>
         </DialogHeader>
@@ -69,13 +69,13 @@ export default function OrderEditModal({
         <div className="space-y-5 p-6">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
+              <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-gray-500">
                 Status
               </label>
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
+                className="h-9 w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
               >
                 {statusOptions.map((s) => (
                   <option key={s}>{s}</option>
@@ -83,13 +83,13 @@ export default function OrderEditModal({
               </select>
             </div>
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
+              <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-gray-500">
                 Payment
               </label>
               <select
                 value={formData.payment}
                 onChange={(e) => setFormData({ ...formData, payment: e.target.value })}
-                className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
+                className="h-9 w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
               >
                 <option>Credit Card</option>
                 <option>Bank Transfer</option>
@@ -99,15 +99,15 @@ export default function OrderEditModal({
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
+            <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-gray-500">
               Customer
             </label>
             <p className="text-[13px] font-semibold">{order.customer}</p>
-            <p className="mt-0.5 text-[11px] text-gray-400">{order.email}</p>
+            <p className="mt-0.5 text-[13px] text-gray-400">{order.email}</p>
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
+            <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-gray-500">
               Notes
             </label>
             <textarea
@@ -120,29 +120,29 @@ export default function OrderEditModal({
           </div>
 
           <div className="rounded-lg border border-gray-100 bg-gray-50/50 p-4">
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.15em] text-gray-400">
               Order Summary
             </p>
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-[11px]">
+              <div className="flex items-center justify-between text-[13px]">
                 <span className="text-gray-400">Order ID</span>
-                <span className="font-mono text-[10px] font-semibold">{order.id}</span>
+                <span className="font-mono text-xs font-semibold">{order.id}</span>
               </div>
-              <div className="flex items-center justify-between text-[11px]">
+              <div className="flex items-center justify-between text-[13px]">
                 <span className="text-gray-400">Items</span>
                 <span className="font-semibold">{order.items}</span>
               </div>
-              <div className="flex items-center justify-between text-[11px]">
+              <div className="flex items-center justify-between text-[13px]">
                 <span className="text-gray-400">Total</span>
                 <span className="font-semibold">{order.total}</span>
               </div>
-              <div className="flex items-center justify-between text-[11px]">
+              <div className="flex items-center justify-between text-[13px]">
                 <span className="text-gray-400">Date</span>
                 <span className="font-semibold">{order.date}</span>
               </div>
-              <div className="flex items-center justify-between text-[11px]">
+              <div className="flex items-center justify-between text-[13px]">
                 <span className="text-gray-400">Status</span>
-                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusColors[formData.status]}`}>
+                <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${statusColors[formData.status]}`}>
                   {formData.status}
                 </span>
               </div>

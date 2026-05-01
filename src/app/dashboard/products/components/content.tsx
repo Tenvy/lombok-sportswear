@@ -4,18 +4,19 @@ import {
   Download,
   Package,
   CheckCircle,
-  AlertTriangle,
+  WarningCircle,
   XCircle,
-  CircleCheck,
-  CircleX,
+  Check,
+  X,
   Plus,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import ProductsTable from "./table";
 import ProductFilter from "./filter";
 import ProductEditModal from "./modal";
 import ExportModal from "./exportModal";
 import { useState } from "react";
 import { useProductStore } from "../../../../store/useProductStore";
+import { DashboardContentSkeleton } from "../../components/loading-skeleton";
 
 interface StoreProduct {
   id: string;
@@ -62,15 +63,15 @@ function mapToDisplayProduct(p: StoreProduct) {
   if (stock === 0) {
     status = "Out of Stock";
     statusColor = "text-red-600 bg-red-50";
-    statusIcon = <CircleX className="text-[10px]" />;
+    statusIcon = <X size={14} weight="fill" className="text-red-500" />;
   } else if (p.status === "DRAFT") {
     status = "Draft";
     statusColor = "text-gray-600 bg-gray-100";
-    statusIcon = <CircleCheck className="text-[10px]" />;
+    statusIcon = <Check size={14} weight="fill" className="text-gray-400" />;
   } else {
     status = "Published";
     statusColor = "text-emerald-700 bg-emerald-50";
-    statusIcon = <CircleCheck className="text-[10px]" />;
+    statusIcon = <Check size={14} weight="fill" className="text-emerald-500" />;
   }
 
   const stockColor =
@@ -114,7 +115,7 @@ export default function ProductsContent({
   const displayProducts = products.map(mapToDisplayProduct);
 
   return (
-    <div className="flex-1 p-6">
+    <div className="flex-1 px-6 py-5">
       <ProductEditModal
         open={showCreateModal}
         onClose={() => setShowCreateModal(false)}
@@ -126,95 +127,91 @@ export default function ProductsContent({
       />
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold tracking-tight">Products</h1>
-          <p className="mt-0.5 text-[12px] text-gray-400">
+          <h1 className="text-lg font-bold tracking-tight">Products</h1>
+          <p className="mt-0.5 text-[13px] text-gray-400">
             Manage your product catalog, inventory, and pricing.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowExportModal(true)}
-            className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-[12px] font-semibold transition-colors hover:border-gray-400"
+            className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-[13px] font-semibold transition-colors hover:border-gray-400"
           >
-            <Download className="text-sm" />
+            <Download size={16} />
             Export
           </button>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-1.5 rounded-lg bg-black px-4 py-2 text-[12px] font-semibold text-white transition-colors hover:bg-gray-800"
+            className="flex items-center gap-1.5 rounded-lg bg-black px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-gray-800"
           >
-            <Plus className="text-sm" />
+            <Plus size={16} weight="bold" />
             Add Product
           </button>
         </div>
       </div>
 
       <div className="mb-5 grid grid-cols-4 gap-3">
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
+        <div className="rounded-lg border border-gray-200 bg-white p-5">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-gray-400">
+            <span className="text-xs font-medium uppercase tracking-wider text-gray-400">
               Total Products
             </span>
-            <Package className="text-lg text-gray-300" />
+            <Package size={20} className="text-gray-300" />
           </div>
-          <p className="text-2xl font-bold tracking-tight">{total}</p>
-          <p className="mt-1 text-[11px] font-medium text-emerald-600">
+          <p className="text-xl font-bold tracking-tight">{total}</p>
+          <p className="mt-1 text-[13px] font-medium text-emerald-600">
             +8 this month
           </p>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
+        <div className="rounded-lg border border-gray-200 bg-white p-5">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-gray-400">
+            <span className="text-xs font-medium uppercase tracking-wider text-gray-400">
               Published
             </span>
-            <CheckCircle className="text-lg text-gray-300" />
+            <CheckCircle size={20} className="text-gray-300" />
           </div>
-          <p className="text-2xl font-bold tracking-tight">
+          <p className="text-xl font-bold tracking-tight">
             {displayProducts.filter((p) => p.status === "Published").length}
           </p>
-          <p className="mt-1 text-[11px] font-medium text-gray-400">
+          <p className="mt-1 text-[13px] font-medium text-gray-400">
             {products.length
               ? `${((displayProducts.filter((p) => p.status === "Published").length / products.length) * 100).toFixed(1)}% of total`
               : "0% of total"}
           </p>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
+        <div className="rounded-lg border border-gray-200 bg-white p-5">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-gray-400">
+            <span className="text-xs font-medium uppercase tracking-wider text-gray-400">
               Low Stock
             </span>
-            <AlertTriangle className="text-lg text-gray-300" />
+            <WarningCircle size={20} className="text-gray-300" />
           </div>
-          <p className="text-2xl font-bold tracking-tight text-amber-600">
+          <p className="text-xl font-bold tracking-tight text-amber-600">
             {displayProducts.filter((p) => p.stock > 0 && p.stock <= 10).length}
           </p>
-          <p className="mt-1 text-[11px] font-medium text-amber-600">
+          <p className="mt-1 text-[13px] font-medium text-amber-600">
             Needs restock
           </p>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
+        <div className="rounded-lg border border-gray-200 bg-white p-5">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-gray-400">
+            <span className="text-xs font-medium uppercase tracking-wider text-gray-400">
               Out of Stock
             </span>
-            <XCircle className="text-lg text-gray-300" />
+            <XCircle size={20} className="text-gray-300" />
           </div>
-          <p className="text-2xl font-bold tracking-tight text-red-500">
+          <p className="text-xl font-bold tracking-tight text-red-500">
             {displayProducts.filter((p) => p.outOfStock).length}
           </p>
-          <p className="mt-1 text-[11px] font-medium text-red-500">
+          <p className="mt-1 text-[13px] font-medium text-red-500">
             Action required
           </p>
         </div>
       </div>
 
-      {loading && (
-        <div className="mb-4 rounded-lg border border-gray-200 bg-white p-4 text-center text-[12px] text-gray-400">
-          Loading products...
-        </div>
-      )}
+      {loading && <DashboardContentSkeleton />}
       {error && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-center text-[12px] text-red-500">
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-5 text-center text-[13px] text-red-500">
           {error}
         </div>
       )}

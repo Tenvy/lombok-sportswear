@@ -15,8 +15,8 @@ import {
   Calendar,
   Package,
   User,
-  Mail,
-} from "lucide-react";
+  Envelope,
+} from "@phosphor-icons/react";
 
 interface Order {
   id: string;
@@ -55,11 +55,11 @@ export default function OrderPreviewModal({
         className="sm:max-w-lg overflow-y-auto max-h-[85vh] rounded-lg p-0"
       >
         <DialogHeader className="border-b border-gray-200 px-6 py-4">
-          <DialogTitle className="flex items-center gap-2 text-[14px] font-bold tracking-tight">
-            <ShoppingBag className="size-4" />
+          <DialogTitle className="flex items-center gap-2 text-base font-bold tracking-tight">
+            <ShoppingBag size={16} />
             Order {order.id}
           </DialogTitle>
-          <DialogDescription className="mt-0.5 text-[11px] text-gray-400">
+          <DialogDescription className="mt-0.5 text-[13px] text-gray-400">
             Order details and summary.
           </DialogDescription>
         </DialogHeader>
@@ -67,40 +67,40 @@ export default function OrderPreviewModal({
         <div className="space-y-5 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400">
+              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-gray-400">
                 Status
               </p>
-              <span className={`mt-1 inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusColors[order.status]}`}>
+              <span className={`mt-1 inline-flex items-center rounded-md px-2.5 py-1 text-[13px] font-semibold ${statusColors[order.status]}`}>
                 {order.status}
               </span>
             </div>
             <div className="text-right">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400">
+              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-gray-400">
                 Date
               </p>
               <p className="mt-1 flex items-center justify-end gap-1.5 text-[13px] font-semibold text-gray-700">
-                <Calendar className="size-3.5 text-gray-400" />
+                <Calendar size={14} className="text-gray-400" />
                 {order.date}
               </p>
             </div>
           </div>
 
           <div className="rounded-lg border border-gray-100 bg-gray-50/50 p-4">
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.15em] text-gray-400">
               Customer
             </p>
             <div className="space-y-2">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-[11px] font-bold text-gray-600">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 text-[13px] font-bold text-gray-600">
                   {order.customer.split(" ").map((n) => n[0]).join("").slice(0, 2)}
                 </div>
                 <div>
                   <p className="flex items-center gap-1.5 text-[13px] font-semibold">
-                    <User className="size-3 text-gray-400" />
+                    <User size={14} className="text-gray-400" />
                     {order.customer}
                   </p>
-                  <p className="flex items-center gap-1.5 text-[11px] text-gray-400">
-                    <Mail className="size-3" />
+                  <p className="flex items-center gap-1.5 text-[13px] text-gray-400">
+                    <Envelope size={14} />
                     {order.email}
                   </p>
                 </div>
@@ -110,27 +110,27 @@ export default function OrderPreviewModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="rounded-lg border border-gray-100 bg-gray-50/50 p-4">
-              <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400">
+              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.15em] text-gray-400">
                 Items
               </p>
               <p className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-700">
-                <Package className="size-3.5 text-gray-400" />
+                <Package size={14} className="text-gray-400" />
                 {order.items}
               </p>
             </div>
             <div className="rounded-lg border border-gray-100 bg-gray-50/50 p-4">
-              <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400">
+              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.15em] text-gray-400">
                 Payment
               </p>
               <p className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-700">
-                <CreditCard className="size-3.5 text-gray-400" />
+                <CreditCard size={14} className="text-gray-400" />
                 {order.payment}
               </p>
             </div>
           </div>
 
           <div className="rounded-lg border border-gray-200 bg-gray-50/50 p-4">
-            <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.15em] text-gray-400">
               Total Amount
             </p>
             <p className="text-xl font-bold tracking-tight">{order.total}</p>

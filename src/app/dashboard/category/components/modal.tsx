@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import {
-  RefreshCw,
-  UploadCloud,
-} from "lucide-react";
+  ArrowClockwise,
+  UploadSimple,
+} from "@phosphor-icons/react";
 import {
   Dialog,
   DialogContent,
@@ -53,17 +53,17 @@ export default function CategoryModal({
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
       <DialogContent showCloseButton={false} className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="text-[14px] font-bold tracking-tight">
+          <DialogTitle className="text-base font-bold tracking-tight">
             {isEdit ? "Edit Category" : "Add New Category"}
           </DialogTitle>
-          <DialogDescription className="mt-0.5 text-[11px] text-gray-400">
+          <DialogDescription className="mt-0.5 text-[13px] text-gray-400">
             {isEdit ? "Update category details and settings." : "Fill in the details for a new product category"}
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold text-gray-700">
+            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
               Category Name <span className="text-red-400">*</span>
             </label>
             <input
@@ -71,30 +71,30 @@ export default function CategoryModal({
               value={formData.name}
               onChange={(e) => update("name", e.target.value)}
               placeholder="e.g., Sport Jackets"
-              className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-[12px] transition-colors focus:border-gray-400 focus:outline-none"
+              className="h-9 w-full rounded-lg border border-gray-200 px-3 text-sm transition-colors focus:border-gray-400 focus:outline-none"
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold text-gray-700">URL Slug</label>
+            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">URL Slug</label>
             <div className="relative">
               <input
                 type="text"
                 value={formData.slug}
                 onChange={(e) => update("slug", e.target.value)}
                 placeholder="auto-generated"
-                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 pr-9 font-mono text-[12px] text-gray-500 transition-colors focus:border-gray-400 focus:outline-none"
+                className="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 pr-9 font-mono text-sm text-gray-500 transition-colors focus:border-gray-400 focus:outline-none"
               />
               <button className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 transition-colors hover:text-black">
-                <RefreshCw className="text-xs" />
+                <ArrowClockwise size={14} />
               </button>
             </div>
           </div>
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold text-gray-700">Parent Category</label>
+            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">Parent Category</label>
             <select
               value={formData.parent}
               onChange={(e) => update("parent", e.target.value)}
-              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-[12px] text-gray-500 transition-colors focus:border-gray-400 focus:outline-none"
+              className="h-9 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-500 transition-colors focus:border-gray-400 focus:outline-none"
             >
               <option>No Parent (Top Level)</option>
               <option>Men&apos;s Collection</option>
@@ -103,7 +103,7 @@ export default function CategoryModal({
             </select>
           </div>
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold text-gray-700">Status</label>
+            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">Status</label>
             <div className="flex items-center gap-3 py-2">
               {["Active", "Inactive", "Draft"].map((s) => (
                 <label key={s} className="flex cursor-pointer items-center gap-2">
@@ -114,47 +114,47 @@ export default function CategoryModal({
                     onChange={() => update("status", s)}
                     className="h-3.5 w-3.5 accent-black"
                   />
-                  <span className={`text-[11px] font-medium ${s === "Active" ? "" : "text-gray-500"}`}>{s}</span>
+                  <span className={`text-[13px] font-medium ${s === "Active" ? "" : "text-gray-500"}`}>{s}</span>
                 </label>
               ))}
             </div>
           </div>
           <div className="col-span-2">
-            <label className="mb-1.5 block text-[11px] font-semibold text-gray-700">Description</label>
+            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">Description</label>
             <textarea
               value={formData.description}
               onChange={(e) => update("description", e.target.value)}
               placeholder="Brief description of this category..."
               rows={3}
-              className="w-full resize-none rounded-lg border border-gray-200 px-3 py-2.5 text-[12px] transition-colors focus:border-gray-400 focus:outline-none"
+              className="w-full resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm transition-colors focus:border-gray-400 focus:outline-none"
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold text-gray-700">Meta Description</label>
+            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">Meta Description</label>
             <input
               type="text"
               value={formData.metaDescription}
               onChange={(e) => update("metaDescription", e.target.value)}
               placeholder="SEO meta description"
-              className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-[12px] transition-colors focus:border-gray-400 focus:outline-none"
+              className="h-9 w-full rounded-lg border border-gray-200 px-3 text-sm transition-colors focus:border-gray-400 focus:outline-none"
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold text-gray-700">Meta Keywords</label>
+            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">Meta Keywords</label>
             <input
               type="text"
               value={formData.metaKeywords}
               onChange={(e) => update("metaKeywords", e.target.value)}
               placeholder="keyword1, keyword2, keyword3"
-              className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-[12px] transition-colors focus:border-gray-400 focus:outline-none"
+              className="h-9 w-full rounded-lg border border-gray-200 px-3 text-sm transition-colors focus:border-gray-400 focus:outline-none"
             />
           </div>
           <div className="col-span-2">
-            <label className="mb-1.5 block text-[11px] font-semibold text-gray-700">Featured Image</label>
+            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">Featured Image</label>
             <div className="cursor-pointer rounded-lg border-2 border-dashed border-gray-200 p-4 text-center transition-colors hover:border-gray-400">
-              <UploadCloud className="mx-auto text-2xl text-gray-300" />
-              <p className="mt-1.5 text-[11px] text-gray-400">Click to upload or drag and drop</p>
-              <p className="mt-0.5 text-[9px] text-gray-300">PNG, JPG or WebP (max 2MB)</p>
+              <UploadSimple size={24} className="mx-auto text-gray-300" />
+              <p className="mt-1.5 text-[13px] text-gray-400">Click to upload or drag and drop</p>
+              <p className="mt-0.5 text-xs text-gray-300">PNG, JPG or WebP (max 2MB)</p>
             </div>
           </div>
         </div>

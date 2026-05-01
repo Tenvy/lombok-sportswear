@@ -30,6 +30,202 @@ function enrichProduct(product: any) {
   };
 }
 
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (id) {
+      const product = await prisma.product.findFirst({
+        where: {
+          OR: [{ slug: id }, { id }],
+        },
+        include: {
+          productCategories: {
+            include: {
+              category: true,
+            },
+          },
+          variants: true,
+        },
+      });
+
+      if (!product) {
+        return NextResponse.json(
+          { error: "Product not found" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json(enrichProduct(product));
+    }
+
+    const category = searchParams.get("category");
+    const categories = searchParams.get("categories");
+    const categoryNames = searchParams.get("categoryNames");
+    const stockStatuses = searchParams.get("stockStatuses");
+    const minPrice = searchParams.get("minPrice");
+    const maxPrice = searchParams.get("maxPrice");
+    const statuses = searchParams.get("statuses");
+    const soldOut = searchParams.get("soldOut");
+    const query = searchParams.get("query");
+    const search = searchParams.get("search");
+    const pageParam = searchParams.get("page");
+    const limitParam = searchParams.get("limit");
+
+    const andConditions: any[] = [];
+
+    if (query) {
+      andConditions.push({
+        OR: [
+          { name: { contains: query } },
+          { description: { contains: query } },
+        ],
+      });
+    }
+
+    if (search) {
+      andConditions.push({ name: { contains: search } });
+    }
+
+    if (categories) {
+      const categorySlugs = categories.split(",").map((c) => c.trim());
+      andConditions.push({
+        productCategories: {
+          some: {
+            category: {
+              slug: { in: categorySlugs },
+            },
+          },
+        },
+      });
+    } else if (category) {
+      andConditions.push({
+        productCategories: {
+          some: {
+            category: {
+              slug: category,
+            },
+          },
+        },
+      });
+    }
+
+    if (categoryNames) {
+      const names = categoryNames.split(",").map((c) => c.trim());
+      andConditions.push({
+        productCategories: {
+          some: {
+            category: {
+              name: { in: names },
+            },
+          },
+        },
+      });
+    }
+
+    if (minPrice != null || maxPrice != null) {
+      const priceCond: any = {};
+      if (minPrice != null) priceCond.gte = parseInt(minPrice, 10);
+      if (maxPrice != null) priceCond.lte = parseInt(maxPrice, 10);
+      andConditions.push({ price: priceCond });
+    }
+
+    if (stockStatuses) {
+      const statusesList = stockStatuses.split(",");
+      const stockOr: any[] = [];
+      if (statusesList.includes("out_of_stock")) {
+        stockOr.push({ variants: { none: { stock: { gt: 0 } } } });
+      }
+      if (statusesList.includes("low_stock")) {
+        stockOr.push({ variants: { some: { stock: { gt: 0, lte: 10 } } } });
+      }
+      if (statusesList.includes("in_stock")) {
+        stockOr.push({ variants: { some: { stock: { gt: 10 } } } });
+      }
+      if (stockOr.length > 0) {
+        andConditions.push({ OR: stockOr });
+      }
+    }
+
+    if (statuses) {
+      andConditions.push({ status: { in: statuses.split(",") } });
+    }
+
+    if (soldOut === "false") {
+      andConditions.push({ variants: { some: { stock: { gt: 0 } } } });
+    } else if (soldOut === "true") {
+      andConditions.push({ variants: { none: { stock: { gt: 0 } } } });
+    }
+
+    const where = andConditions.length > 0 ? { AND: andConditions } : {};
+
+    const page = pageParam ? Math.max(1, parseInt(pageParam, 10)) : null;
+    const limit = limitParam ? Math.max(1, parseInt(limitParam, 10)) : null;
+
+    if (page && limit) {
+      const skip = (page - 1) * limit;
+
+      const [products, total] = await Promise.all([
+        prisma.product.findMany({
+          where,
+          include: {
+            productCategories: {
+              include: {
+                category: true,
+              },
+            },
+            variants: true,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+          skip,
+          take: limit,
+        }),
+        prisma.product.count({ where }),
+      ]);
+
+      const totalPages = Math.ceil(total / limit);
+      const pagesLeft = Math.max(0, totalPages - page);
+
+      return NextResponse.json({
+        products: products.map(enrichProduct),
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+          pagesLeft,
+        },
+      });
+    }
+
+    const products = await prisma.product.findMany({
+      where,
+      include: {
+        productCategories: {
+          include: {
+            category: true,
+          },
+        },
+        variants: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return NextResponse.json(products.map(enrichProduct));
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch products" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -272,7 +468,6 @@ export async function PUT(request: NextRequest) {
       }
     });
 
-    // Move new images to permanent after DB succeeds
     let finalImage = existing.image;
     let finalImages = existing.images;
 
@@ -299,7 +494,6 @@ export async function PUT(request: NextRequest) {
       });
     }
 
-    // Delete old images from R2 only after DB is updated
     if (image !== undefined && finalImage !== existing.image && existing.image) {
       const oldKey = extractR2KeyFromUrl(existing.image);
       if (oldKey) await deleteFromR2({ key: oldKey });
@@ -400,202 +594,6 @@ export async function DELETE(request: NextRequest) {
     console.error("Error deleting product:", error);
     return NextResponse.json(
       { error: "Failed to delete product" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-
-    if (id) {
-      const product = await prisma.product.findFirst({
-        where: {
-          OR: [{ slug: id }, { id }],
-        },
-        include: {
-          productCategories: {
-            include: {
-              category: true,
-            },
-          },
-          variants: true,
-        },
-      });
-
-      if (!product) {
-        return NextResponse.json(
-          { error: "Product not found" },
-          { status: 404 }
-        );
-      }
-
-      return NextResponse.json(enrichProduct(product));
-    }
-
-    const category = searchParams.get("category");
-    const categories = searchParams.get("categories");
-    const categoryNames = searchParams.get("categoryNames");
-    const stockStatuses = searchParams.get("stockStatuses");
-    const minPrice = searchParams.get("minPrice");
-    const maxPrice = searchParams.get("maxPrice");
-    const statuses = searchParams.get("statuses");
-    const soldOut = searchParams.get("soldOut");
-    const query = searchParams.get("query");
-    const search = searchParams.get("search");
-    const pageParam = searchParams.get("page");
-    const limitParam = searchParams.get("limit");
-
-    const andConditions: any[] = [];
-
-    if (query) {
-      andConditions.push({
-        OR: [
-          { name: { contains: query } },
-          { description: { contains: query } },
-        ],
-      });
-    }
-
-    if (search) {
-      andConditions.push({ name: { contains: search } });
-    }
-
-    if (categories) {
-      const categorySlugs = categories.split(",").map((c) => c.trim());
-      andConditions.push({
-        productCategories: {
-          some: {
-            category: {
-              slug: { in: categorySlugs },
-            },
-          },
-        },
-      });
-    } else if (category) {
-      andConditions.push({
-        productCategories: {
-          some: {
-            category: {
-              slug: category,
-            },
-          },
-        },
-      });
-    }
-
-    if (categoryNames) {
-      const names = categoryNames.split(",").map((c) => c.trim());
-      andConditions.push({
-        productCategories: {
-          some: {
-            category: {
-              name: { in: names },
-            },
-          },
-        },
-      });
-    }
-
-    if (minPrice != null || maxPrice != null) {
-      const priceCond: any = {};
-      if (minPrice != null) priceCond.gte = parseInt(minPrice, 10);
-      if (maxPrice != null) priceCond.lte = parseInt(maxPrice, 10);
-      andConditions.push({ price: priceCond });
-    }
-
-    if (stockStatuses) {
-      const statusesList = stockStatuses.split(",");
-      const stockOr: any[] = [];
-      if (statusesList.includes("out_of_stock")) {
-        stockOr.push({ variants: { none: { stock: { gt: 0 } } } });
-      }
-      if (statusesList.includes("low_stock")) {
-        stockOr.push({ variants: { some: { stock: { gt: 0, lte: 10 } } } });
-      }
-      if (statusesList.includes("in_stock")) {
-        stockOr.push({ variants: { some: { stock: { gt: 10 } } } });
-      }
-      if (stockOr.length > 0) {
-        andConditions.push({ OR: stockOr });
-      }
-    }
-
-    if (statuses) {
-      andConditions.push({ status: { in: statuses.split(",") } });
-    }
-
-    if (soldOut === "false") {
-      andConditions.push({ variants: { some: { stock: { gt: 0 } } } });
-    } else if (soldOut === "true") {
-      andConditions.push({ variants: { none: { stock: { gt: 0 } } } });
-    }
-
-    const where = andConditions.length > 0 ? { AND: andConditions } : {};
-
-    const page = pageParam ? Math.max(1, parseInt(pageParam, 10)) : null;
-    const limit = limitParam ? Math.max(1, parseInt(limitParam, 10)) : null;
-
-    if (page && limit) {
-      const skip = (page - 1) * limit;
-
-      const [products, total] = await Promise.all([
-        prisma.product.findMany({
-          where,
-          include: {
-            productCategories: {
-              include: {
-                category: true,
-              },
-            },
-            variants: true,
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
-          skip,
-          take: limit,
-        }),
-        prisma.product.count({ where }),
-      ]);
-
-      const totalPages = Math.ceil(total / limit);
-      const pagesLeft = Math.max(0, totalPages - page);
-
-      return NextResponse.json({
-        products: products.map(enrichProduct),
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages,
-          pagesLeft,
-        },
-      });
-    }
-
-    const products = await prisma.product.findMany({
-      where,
-      include: {
-        productCategories: {
-          include: {
-            category: true,
-          },
-        },
-        variants: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
-    return NextResponse.json(products.map(enrichProduct));
-  } catch (error) {
-    console.error("Error fetching products:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch products" },
       { status: 500 }
     );
   }

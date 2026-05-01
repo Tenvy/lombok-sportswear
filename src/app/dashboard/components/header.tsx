@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ChevronRight, ChevronDown, LogOut } from "lucide-react";
+import { CaretRight, SignOut } from "@phosphor-icons/react";
 
 const routeLabels: Record<string, string> = {
   dashboard: "Dashboard",
@@ -25,11 +25,11 @@ export default function DashboardHeader() {
   }));
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center border-b border-gray-200 bg-white px-8">
-      <div className="flex items-center gap-2 text-[12px]">
+    <header className="sticky top-0 z-40 flex h-14 items-center border-b border-gray-200 bg-white px-6">
+      <div className="flex items-center gap-2 text-[13px]">
         {breadcrumbs.map((crumb, index) => (
           <span key={index} className="flex items-center gap-2">
-            {index > 0 && <ChevronRight className="text-[10px] text-gray-300" />}
+            {index > 0 && <CaretRight size={14} className="text-gray-300" />}
             <span className={crumb.isLast ? "font-semibold" : "text-gray-400"}>
               {crumb.label}
             </span>
@@ -39,14 +39,14 @@ export default function DashboardHeader() {
 
       <div className="ml-auto flex items-center gap-4">
         <div className="flex items-center gap-2.5 border-l border-gray-200 pl-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-900 text-[11px] font-bold text-white">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white">
             AD
           </div>
           <div className="pr-4">
-            <p className="text-[12px] font-semibold leading-tight">Admin Utama</p>
-            <p className="text-[10px] text-gray-400">Super Admin</p>
+            <p className="text-[13px] font-semibold leading-tight">Admin Utama</p>
+            <p className="text-xs text-gray-400">Super Admin</p>
           </div>
-          <LogOut className="text-sm text-gray-400" />
+          <SignOut size={16} className="text-gray-400" />
         </div>
       </div>
     </header>
