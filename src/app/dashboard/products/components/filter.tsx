@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { CaretDown } from "@phosphor-icons/react";
 import { useProductStore } from "@/src/store/useProductStore";
 import { useCategoryStore } from "@/src/store/useCategoryStore";
 
@@ -20,11 +20,12 @@ function FilterSection({
     <div className="border-t border-gray-100 pt-4 mb-4">
       <button
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between text-[10px] font-bold uppercase tracking-[0.1em] text-gray-400"
+        className="flex w-full items-center justify-between text-xs font-bold uppercase tracking-[0.1em] text-gray-400"
       >
         {title}
-        <ChevronDown
-          className={`size-3 text-gray-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        <CaretDown
+          size={14}
+          className={`text-gray-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
         />
       </button>
       {open && <div className="mt-2.5">{children}</div>}
@@ -106,15 +107,15 @@ export default function ProductFilter() {
   };
 
   return (
-    <aside className="hidden w-[210px] flex-shrink-0 xl:block">
-      <div className="sticky top-[20px] rounded-lg border border-gray-200 bg-white p-4">
+    <aside className="hidden w-[240px] flex-shrink-0 xl:block">
+      <div className="sticky top-[20px] rounded-lg border border-gray-200 bg-white p-5">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-[11px] font-bold uppercase tracking-[0.12em]">
+          <h3 className="text-[13px] font-bold uppercase tracking-[0.12em]">
             Filters
           </h3>
           <button
             onClick={clear}
-            className="text-[10px] font-medium text-gray-400 transition-colors hover:text-black"
+            className="text-xs font-medium text-gray-400 transition-colors hover:text-black"
           >
             Clear All
           </button>
@@ -133,10 +134,10 @@ export default function ProductFilter() {
                   onChange={() => toggleCategory(cat.name)}
                   className="h-3.5 w-3.5 rounded accent-black"
                 />
-                <span className="text-[12px] text-gray-600 transition-colors group-hover:text-black">
+                <span className="text-[13px] text-gray-600 transition-colors group-hover:text-black">
                   {cat.name}
                 </span>
-                <span className="ml-auto text-[10px] text-gray-300">
+                <span className="ml-auto text-xs text-gray-300">
                   {cat._count?.productCategories ?? 0}
                 </span>
               </label>
@@ -157,7 +158,7 @@ export default function ProductFilter() {
                   onChange={() => toggleStock(status.value)}
                   className="h-3.5 w-3.5 rounded accent-black"
                 />
-                <span className="flex items-center gap-1.5 text-[12px] text-gray-600 transition-colors group-hover:text-black">
+                <span className="flex items-center gap-1.5 text-[13px] text-gray-600 transition-colors group-hover:text-black">
                   <span
                     className={`h-1.5 w-1.5 rounded-full ${status.color}`}
                   />
@@ -178,7 +179,7 @@ export default function ProductFilter() {
             onChange={(e) => setLocalMaxPrice(Number(e.target.value))}
             className="mb-2 w-full"
           />
-          <div className="flex items-center justify-between text-[10px] text-gray-400">
+          <div className="flex items-center justify-between text-xs text-gray-400">
             <span>Rp 0</span>
             <span>Rp {(localMaxPrice / 1000).toFixed(0)}K</span>
           </div>
@@ -197,7 +198,7 @@ export default function ProductFilter() {
                   onChange={() => toggleStatus(status.value)}
                   className="h-3.5 w-3.5 rounded accent-black"
                 />
-                <span className="text-[12px] text-gray-600 transition-colors group-hover:text-black">
+                <span className="text-[13px] text-gray-600 transition-colors group-hover:text-black">
                   {status.label}
                 </span>
               </label>
@@ -207,7 +208,7 @@ export default function ProductFilter() {
 
         <button
           onClick={apply}
-          className="mt-2 w-full rounded-lg bg-black py-2.5 text-[11px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-gray-800"
+          className="mt-2 w-full rounded-lg bg-black h-9 text-[13px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-gray-800"
         >
           Apply Filters
         </button>

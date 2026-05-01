@@ -3,9 +3,9 @@
 import { useState } from "react";
 import {
   Calendar,
-  ChevronDown,
-  Download,
-} from "lucide-react";
+  CaretDown,
+  DownloadSimple,
+} from "@phosphor-icons/react";
 import DashboardHeader from "../../components/header";
 import OrdersTable from "./table";
 import OrdersKpiCards from "./card";
@@ -39,25 +39,25 @@ export default function OrdersContent() {
         onClose={() => setShowExportModal(false)}
       />
       <DashboardHeader />
-      <main className="flex-1 overflow-y-auto px-8 py-6">
+      <main className="flex-1 overflow-y-auto px-6 py-5">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold tracking-tight">Orders Management</h1>
-            <p className="mt-0.5 text-[12px] text-gray-400">
+            <h1 className="text-lg font-bold tracking-tight">Orders Management</h1>
+            <p className="mt-0.5 text-[13px] text-gray-400">
               Track and manage all customer orders.
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-2 rounded-lg border border-gray-200 px-3.5 py-2 text-[11px] font-semibold transition-colors hover:bg-gray-50">
-              <Calendar className="text-sm" />
+            <button className="flex items-center gap-2 rounded-lg border border-gray-200 px-3.5 py-2 text-[13px] font-semibold transition-colors hover:bg-gray-50">
+              <Calendar size={16} />
               Last 30 Days
-              <ChevronDown className="text-xs" />
+              <CaretDown size={14} />
             </button>
             <button
               onClick={() => setShowExportModal(true)}
-              className="flex items-center gap-2 rounded-lg bg-black px-3.5 py-2 text-[11px] font-semibold text-white transition-colors hover:bg-gray-800"
+              className="flex items-center gap-2 rounded-lg bg-black px-3.5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-gray-800"
             >
-              <Download className="text-sm" />
+              <DownloadSimple size={16} />
               Export
             </button>
           </div>

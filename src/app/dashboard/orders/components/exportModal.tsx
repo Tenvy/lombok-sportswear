@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Download, FileSpreadsheet, FileText } from "lucide-react";
+import { DownloadSimple, FileXls, FileText } from "@phosphor-icons/react";
 import {
   Dialog,
   DialogContent,
@@ -53,47 +53,47 @@ export default function ExportModal({ open, onClose }: { open: boolean; onClose:
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
       <DialogContent showCloseButton={false} className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-[14px] font-bold tracking-tight">
+          <DialogTitle className="text-base font-bold tracking-tight">
             Export Orders
           </DialogTitle>
-          <DialogDescription className="mt-0.5 text-[11px] text-gray-400">
+          <DialogDescription className="mt-0.5 text-[13px] text-gray-400">
             Choose fields, format, and filters for your export.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-5">
           <div>
-            <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.1em] text-gray-400">
+            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.1em] text-gray-400">
               Export Format
             </label>
             <div className="flex gap-2">
               <button
                 onClick={() => setFormat("csv")}
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-[12px] font-medium transition-colors ${
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-[13px] font-medium transition-colors ${
                   format === "csv"
                     ? "border-black bg-black text-white"
                     : "border-gray-200 text-gray-500 hover:border-gray-400 hover:text-black"
                 }`}
               >
-                <FileText className="size-3.5" />
+                <FileText size={14} />
                 CSV
               </button>
               <button
                 onClick={() => setFormat("excel")}
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-[12px] font-medium transition-colors ${
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-[13px] font-medium transition-colors ${
                   format === "excel"
                     ? "border-black bg-black text-white"
                     : "border-gray-200 text-gray-500 hover:border-gray-400 hover:text-black"
                 }`}
               >
-                <FileSpreadsheet className="size-3.5" />
+                <FileXls size={14} />
                 Excel
               </button>
             </div>
           </div>
 
           <div>
-            <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.1em] text-gray-400">
+            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.1em] text-gray-400">
               Fields to Export
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -117,7 +117,7 @@ export default function ExportModal({ open, onClose }: { open: boolean; onClose:
                     onChange={() => toggleField(key)}
                     className="h-3.5 w-3.5 rounded accent-black"
                   />
-                  <span className="text-[12px] text-gray-600 transition-colors group-hover:text-black">
+                  <span className="text-[13px] text-gray-600 transition-colors group-hover:text-black">
                     {label}
                   </span>
                 </label>
@@ -126,7 +126,7 @@ export default function ExportModal({ open, onClose }: { open: boolean; onClose:
           </div>
 
           <div>
-            <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.1em] text-gray-400">
+            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.1em] text-gray-400">
               Filter by Status
             </label>
             <div className="flex flex-wrap gap-2">
@@ -147,7 +147,7 @@ export default function ExportModal({ open, onClose }: { open: boolean; onClose:
                     onChange={() => toggleFilter(key)}
                     className="h-3.5 w-3.5 rounded accent-black"
                   />
-                  <span className="text-[12px] text-gray-600 transition-colors group-hover:text-black">
+                  <span className="text-[13px] text-gray-600 transition-colors group-hover:text-black">
                     {label}
                   </span>
                 </label>
@@ -156,7 +156,7 @@ export default function ExportModal({ open, onClose }: { open: boolean; onClose:
           </div>
 
           <div>
-            <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.1em] text-gray-400">
+            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.1em] text-gray-400">
               Filter by Payment
             </label>
             <div className="flex flex-wrap gap-2">
@@ -175,7 +175,7 @@ export default function ExportModal({ open, onClose }: { open: boolean; onClose:
                     onChange={() => toggleFilter(key)}
                     className="h-3.5 w-3.5 rounded accent-black"
                   />
-                  <span className="text-[12px] text-gray-600 transition-colors group-hover:text-black">
+                  <span className="text-[13px] text-gray-600 transition-colors group-hover:text-black">
                     {label}
                   </span>
                 </label>
@@ -189,7 +189,7 @@ export default function ExportModal({ open, onClose }: { open: boolean; onClose:
             Cancel
           </DialogClose>
           <Button size="sm" onClick={handleExport}>
-            <Download className="mr-1 size-3.5" />
+            <DownloadSimple size={14} className="mr-1" />
             Export
           </Button>
         </div>

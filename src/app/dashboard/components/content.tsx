@@ -1,17 +1,19 @@
+"use client";
+
 import Image from "next/image";
 import {
   Calendar,
-  ChevronDown,
-  Download,
-  Banknote,
+  CaretDown,
+  DownloadSimple,
+  Money,
   ShoppingBag,
   Users,
   Target,
   Receipt,
   Eye,
-  TrendingUp,
+  TrendUp,
   Wallet,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import DashboardHeader from "./header";
 import DashboardSidebar from "./sidebar";
 
@@ -33,7 +35,7 @@ const kpiCards: KpiCard[] = [
     positive: true,
     iconBg: "bg-emerald-50",
     iconColor: "text-emerald-600",
-    icon: <Banknote className="text-base" />,
+    icon: <Money size={20} />,
   },
   {
     label: "Orders",
@@ -42,7 +44,7 @@ const kpiCards: KpiCard[] = [
     positive: true,
     iconBg: "bg-sky-50",
     iconColor: "text-sky-600",
-    icon: <ShoppingBag className="text-base" />,
+    icon: <ShoppingBag size={20} />,
   },
   {
     label: "Customers",
@@ -51,7 +53,7 @@ const kpiCards: KpiCard[] = [
     positive: true,
     iconBg: "bg-violet-50",
     iconColor: "text-violet-600",
-    icon: <Users className="text-base" />,
+    icon: <Users size={20} />,
   },
   {
     label: "Conversion",
@@ -60,7 +62,7 @@ const kpiCards: KpiCard[] = [
     positive: false,
     iconBg: "bg-amber-50",
     iconColor: "text-amber-600",
-    icon: <Target className="text-base" />,
+    icon: <Target size={20} />,
   },
   {
     label: "Avg. Order",
@@ -69,7 +71,7 @@ const kpiCards: KpiCard[] = [
     positive: true,
     iconBg: "bg-rose-50",
     iconColor: "text-rose-600",
-    icon: <Receipt className="text-base" />,
+    icon: <Receipt size={20} />,
   },
   {
     label: "Visitors",
@@ -78,7 +80,7 @@ const kpiCards: KpiCard[] = [
     positive: true,
     iconBg: "bg-gray-100",
     iconColor: "text-gray-600",
-    icon: <Eye className="text-base" />,
+    icon: <Eye size={20} />,
   },
 ];
 
@@ -114,23 +116,23 @@ export default function DashboardContent() {
     <DashboardSidebar />
     <div className="flex flex-1 flex-col overflow-hidden">
       <DashboardHeader />
-      <main className="flex-1 overflow-y-auto px-8 py-6">
+      <main className="flex-1 overflow-y-auto px-6 py-5">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold tracking-tight">Dashboard Overview</h1>
-          <p className="mt-0.5 text-[12px] text-gray-400">
+          <p className="mt-0.5 text-[13px] text-gray-400">
             Welcome back. Here&apos;s your business summary for{" "}
             <span className="font-medium text-gray-600">June 2025</span>.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 rounded-lg border border-gray-200 px-3.5 py-2 text-[11px] font-semibold transition-colors hover:bg-gray-50">
-            <Calendar className="text-sm" />
+          <button className="flex items-center gap-2 rounded-lg border border-gray-200 px-3.5 py-2 text-[13px] font-semibold transition-colors hover:bg-gray-50">
+            <Calendar size={16} />
             Last 30 Days
-            <ChevronDown className="text-xs" />
+            <CaretDown size={14} />
           </button>
-          <button className="flex items-center gap-2 rounded-lg bg-black px-3.5 py-2 text-[11px] font-semibold text-white transition-colors hover:bg-gray-800">
-            <Download className="text-sm" />
+          <button className="flex items-center gap-2 rounded-lg bg-black px-3.5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-gray-800">
+            <DownloadSimple size={16} />
             Export
           </button>
         </div>
@@ -138,16 +140,16 @@ export default function DashboardContent() {
 
       <div className="mb-6 grid grid-cols-3 gap-4 xl:grid-cols-6">
         {kpiCards.map((kpi) => (
-          <div key={kpi.label} className="rounded-xl border border-gray-200 bg-white p-4">
+          <div key={kpi.label} className="rounded-xl border border-gray-200 bg-white p-5">
             <div className="mb-3 flex items-center justify-between">
-              <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${kpi.iconBg} ${kpi.iconColor}`}>
+              <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${kpi.iconBg} ${kpi.iconColor}`}>
                 {kpi.icon}
               </div>
-              <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${kpi.positive ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-500"}`}>
+              <span className={`rounded px-1.5 py-0.5 text-xs font-semibold ${kpi.positive ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-500"}`}>
                 {kpi.change}
               </span>
             </div>
-            <p className="text-[10px] font-medium uppercase tracking-[0.1em] text-gray-400">{kpi.label}</p>
+            <p className="text-xs font-medium uppercase tracking-[0.1em] text-gray-400">{kpi.label}</p>
             <p className="mt-0.5 text-lg font-bold tracking-tight">{kpi.value}</p>
           </div>
         ))}
@@ -158,16 +160,16 @@ export default function DashboardContent() {
           <div className="mb-5 flex items-center justify-between">
             <div>
               <h3 className="text-[13px] font-bold">Revenue Trend</h3>
-              <p className="mt-0.5 text-[11px] text-gray-400">Last 7 days performance</p>
+              <p className="mt-0.5 text-[13px] text-gray-400">Last 7 days performance</p>
             </div>
             <div className="flex items-center gap-1.5">
-              <button className="rounded-md bg-black px-2.5 py-1 text-[10px] font-semibold text-white">7D</button>
-              <button className="rounded-md px-2.5 py-1 text-[10px] font-semibold text-gray-400 transition-colors hover:bg-gray-50">30D</button>
-              <button className="rounded-md px-2.5 py-1 text-[10px] font-semibold text-gray-400 transition-colors hover:bg-gray-50">90D</button>
+              <button className="rounded-md bg-black px-2.5 py-1 text-xs font-semibold text-white">7D</button>
+              <button className="rounded-md px-2.5 py-1 text-xs font-semibold text-gray-400 transition-colors hover:bg-gray-50">30D</button>
+              <button className="rounded-md px-2.5 py-1 text-xs font-semibold text-gray-400 transition-colors hover:bg-gray-50">90D</button>
             </div>
           </div>
           <div className="relative h-[200px]">
-            <div className="absolute left-0 top-0 flex h-full w-10 flex-col justify-between text-[9px] font-medium text-gray-400">
+            <div className="absolute left-0 top-0 flex h-full w-10 flex-col justify-between text-[10px] font-medium text-gray-400">
               <span>25M</span><span>20M</span><span>15M</span><span>10M</span><span>5M</span><span>0</span>
             </div>
             <div className="ml-12 relative h-full">
@@ -196,7 +198,7 @@ export default function DashboardContent() {
                   </linearGradient>
                 </defs>
               </svg>
-              <div className="mt-2 flex justify-between text-[9px] font-medium text-gray-400">
+              <div className="mt-2 flex justify-between text-[10px] font-medium text-gray-400">
                 <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span className="font-semibold text-black">Sun</span>
               </div>
             </div>
@@ -205,28 +207,28 @@ export default function DashboardContent() {
 
         <div className="col-span-4 rounded-xl border border-gray-200 bg-white p-5">
           <h3 className="text-[13px] font-bold">Payment Methods</h3>
-          <p className="mb-5 mt-0.5 text-[11px] text-gray-400">Distribution this month</p>
+          <p className="mb-5 mt-0.5 text-[13px] text-gray-400">Distribution this month</p>
           <div className="mb-5 flex items-center justify-center">
             <svg width="150" height="150" viewBox="0 0 150 150">
               <circle cx="75" cy="75" r="55" fill="none" stroke="#111" strokeWidth="22" strokeDasharray="155.5 190" strokeDashoffset="0" transform="rotate(-90 75 75)" />
               <circle cx="75" cy="75" r="55" fill="none" stroke="#9ca3af" strokeWidth="22" strokeDasharray="121 224.5" strokeDashoffset="-155.5" transform="rotate(-90 75 75)" />
               <circle cx="75" cy="75" r="55" fill="none" stroke="#e5e7eb" strokeWidth="22" strokeDasharray="69.1 276.4" strokeDashoffset="-276.5" transform="rotate(-90 75 75)" />
               <text x="75" y="72" textAnchor="middle" className="text-[22px] font-bold" fill="#000">1,248</text>
-              <text x="75" y="88" textAnchor="middle" className="text-[9px] font-medium" fill="#9ca3af">TOTAL</text>
+              <text x="75" y="88" textAnchor="middle" className="text-[10px] font-medium" fill="#9ca3af">TOTAL</text>
             </svg>
           </div>
           <div className="space-y-2.5">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2"><div className="h-2.5 w-2.5 rounded-full bg-black" /><span className="text-[11px]">Credit Card</span></div>
-              <span className="text-[11px] font-semibold">45%</span>
+              <div className="flex items-center gap-2"><div className="h-2.5 w-2.5 rounded-full bg-black" /><span className="text-[13px]">Credit Card</span></div>
+              <span className="text-[13px] font-semibold">45%</span>
             </div>
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2"><div className="h-2.5 w-2.5 rounded-full bg-gray-400" /><span className="text-[11px]">Bank Transfer</span></div>
-              <span className="text-[11px] font-semibold">35%</span>
+              <div className="flex items-center gap-2"><div className="h-2.5 w-2.5 rounded-full bg-gray-400" /><span className="text-[13px]">Bank Transfer</span></div>
+              <span className="text-[13px] font-semibold">35%</span>
             </div>
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2"><div className="h-2.5 w-2.5 rounded-full bg-gray-200" /><span className="text-[11px]">E-Wallet</span></div>
-              <span className="text-[11px] font-semibold">20%</span>
+              <div className="flex items-center gap-2"><div className="h-2.5 w-2.5 rounded-full bg-gray-200" /><span className="text-[13px]">E-Wallet</span></div>
+              <span className="text-[13px] font-semibold">20%</span>
             </div>
           </div>
         </div>
@@ -235,13 +237,13 @@ export default function DashboardContent() {
       <div className="mb-6 grid grid-cols-12 gap-4">
         <div className="col-span-5 rounded-xl border border-gray-200 bg-white p-5">
           <h3 className="text-[13px] font-bold">Top 5 Products</h3>
-          <p className="mb-5 mt-0.5 text-[11px] text-gray-400">By sales volume this month</p>
+          <p className="mb-5 mt-0.5 text-[13px] text-gray-400">By sales volume this month</p>
           <div className="space-y-3.5">
             {topProducts.map((product) => (
               <div key={product.name}>
                 <div className="mb-1 flex items-center justify-between">
-                  <span className="max-w-[160px] truncate text-[11px] font-medium">{product.name}</span>
-                  <span className="text-[11px] font-bold">{product.sold}</span>
+                  <span className="max-w-[160px] truncate text-[13px] font-medium">{product.name}</span>
+                  <span className="text-[13px] font-bold">{product.sold}</span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-gray-100">
                   <div className={`h-full rounded-full ${product.bg}`} style={{ width: product.width }} />
@@ -255,76 +257,76 @@ export default function DashboardContent() {
           <div className="rounded-xl border border-gray-200 bg-white p-5">
             <div className="mb-4 flex items-center gap-2">
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50">
-                <TrendingUp className="text-sm text-emerald-600" />
+                <TrendUp size={14} className="text-emerald-600" />
               </div>
               <h3 className="text-[13px] font-bold">Income Statement</h3>
             </div>
             <div className="space-y-2.5">
               <div className="flex items-center justify-between py-1.5">
-                <span className="text-[11px] text-gray-500">Revenue</span>
-                <span className="text-[11px] font-semibold">Rp 125.4M</span>
+                <span className="text-[13px] text-gray-500">Revenue</span>
+                <span className="text-[13px] font-semibold">Rp 125.4M</span>
               </div>
               <div className="flex items-center justify-between py-1.5">
-                <span className="text-[11px] text-gray-500">Cost of Goods Sold</span>
-                <span className="text-[11px] font-semibold text-red-500">- Rp 62.1M</span>
+                <span className="text-[13px] text-gray-500">Cost of Goods Sold</span>
+                <span className="text-[13px] font-semibold text-red-500">- Rp 62.1M</span>
               </div>
               <div className="my-1 border-t border-gray-100" />
               <div className="flex items-center justify-between py-1.5">
-                <span className="text-[11px] font-semibold">Gross Profit</span>
-                <span className="text-[11px] font-bold">Rp 63.3M</span>
+                <span className="text-[13px] font-semibold">Gross Profit</span>
+                <span className="text-[13px] font-bold">Rp 63.3M</span>
               </div>
               <div className="flex items-center justify-between py-1.5">
-                <span className="text-[11px] text-gray-500">Operating Expenses</span>
-                <span className="text-[11px] font-semibold text-red-500">- Rp 28.7M</span>
+                <span className="text-[13px] text-gray-500">Operating Expenses</span>
+                <span className="text-[13px] font-semibold text-red-500">- Rp 28.7M</span>
               </div>
               <div className="my-1 border-t border-gray-200" />
               <div className="-mx-2 flex items-center justify-between rounded-lg bg-gray-50 px-2 py-1.5">
-                <span className="text-[11px] font-bold">Net Income</span>
+                <span className="text-[13px] font-bold">Net Income</span>
                 <span className="text-[13px] font-bold text-emerald-600">Rp 34.6M</span>
               </div>
-              <p className="mt-1 text-[9px] text-gray-400">Margin: 27.6%</p>
+              <p className="mt-1 text-[10px] text-gray-400">Margin: 27.6%</p>
             </div>
           </div>
 
           <div className="rounded-xl border border-gray-200 bg-white p-5">
             <div className="mb-4 flex items-center gap-2">
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-sky-50">
-                <Wallet className="text-sm text-sky-600" />
+                <Wallet size={14} className="text-sky-600" />
               </div>
               <h3 className="text-[13px] font-bold">Cashflow</h3>
             </div>
             <div className="space-y-2.5">
               <div className="flex items-center justify-between py-1.5">
-                <span className="text-[11px] text-gray-500">Opening Balance</span>
-                <span className="text-[11px] font-semibold">Rp 85.2M</span>
+                <span className="text-[13px] text-gray-500">Opening Balance</span>
+                <span className="text-[13px] font-semibold">Rp 85.2M</span>
               </div>
               <div className="flex items-center justify-between py-1.5">
-                <span className="text-[11px] text-gray-500">Total Inflows</span>
-                <span className="text-[11px] font-semibold text-emerald-600">+ Rp 132.8M</span>
+                <span className="text-[13px] text-gray-500">Total Inflows</span>
+                <span className="text-[13px] font-semibold text-emerald-600">+ Rp 132.8M</span>
               </div>
               <div className="flex items-center justify-between py-1.5">
-                <span className="text-[11px] text-gray-500">Total Outflows</span>
-                <span className="text-[11px] font-semibold text-red-500">- Rp 98.4M</span>
+                <span className="text-[13px] text-gray-500">Total Outflows</span>
+                <span className="text-[13px] font-semibold text-red-500">- Rp 98.4M</span>
               </div>
               <div className="my-1 border-t border-gray-200" />
               <div className="-mx-2 flex items-center justify-between rounded-lg bg-gray-50 px-2 py-1.5">
-                <span className="text-[11px] font-bold">Closing Balance</span>
+                <span className="text-[13px] font-bold">Closing Balance</span>
                 <span className="text-[13px] font-bold">Rp 119.6M</span>
               </div>
               <div className="mt-3 flex items-center gap-2">
                 <div className="h-2 flex-1 overflow-hidden rounded-full bg-gray-100">
                   <div className="h-full w-[57.5%] rounded-full bg-emerald-500" />
                 </div>
-                <span className="text-[9px] text-gray-400">57.5% inflow ratio</span>
+                <span className="text-[10px] text-gray-400">57.5% inflow ratio</span>
               </div>
               <div className="mt-2 grid grid-cols-2 gap-2">
                 <div className="rounded-lg bg-emerald-50 p-2 text-center">
-                  <p className="text-[9px] font-medium text-emerald-600">INFLOW</p>
-                  <p className="text-[11px] font-bold text-emerald-700">+Rp 132.8M</p>
+                  <p className="text-[10px] font-medium text-emerald-600">INFLOW</p>
+                  <p className="text-[13px] font-bold text-emerald-700">+Rp 132.8M</p>
                 </div>
                 <div className="rounded-lg bg-red-50 p-2 text-center">
-                  <p className="text-[9px] font-medium text-red-500">OUTFLOW</p>
-                  <p className="text-[11px] font-bold text-red-600">-Rp 98.4M</p>
+                  <p className="text-[10px] font-medium text-red-500">OUTFLOW</p>
+                  <p className="text-[13px] font-bold text-red-600">-Rp 98.4M</p>
                 </div>
               </div>
             </div>
@@ -337,30 +339,30 @@ export default function DashboardContent() {
           <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
             <div>
               <h3 className="text-[13px] font-bold">Recent Orders</h3>
-              <p className="mt-0.5 text-[10px] text-gray-400">Latest transactions</p>
+              <p className="mt-0.5 text-xs text-gray-400">Latest transactions</p>
             </div>
-            <a id="view-all-orders" href="#" className="text-[11px] font-semibold hover:underline">View All &rarr;</a>
+            <a id="view-all-orders" href="#" className="text-[13px] font-semibold hover:underline">View All &rarr;</a>
           </div>
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50">
-                <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-400">Order ID</th>
-                <th className="px-3 py-2.5 text-left text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-400">Customer</th>
-                <th className="px-3 py-2.5 text-left text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-400">Total</th>
-                <th className="px-3 py-2.5 text-left text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-400">Status</th>
-                <th className="px-3 py-2.5 text-left text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-400">Date</th>
+                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] text-gray-400">Order ID</th>
+                <th className="px-3 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] text-gray-400">Customer</th>
+                <th className="px-3 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] text-gray-400">Total</th>
+                <th className="px-3 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] text-gray-400">Status</th>
+                <th className="px-3 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] text-gray-400">Date</th>
               </tr>
             </thead>
             <tbody>
               {recentOrders.map((order) => (
                 <tr key={order.id} className="border-t border-gray-50 transition-colors hover:bg-gray-50">
-                  <td className="px-5 py-3 font-mono text-[11px] font-semibold">{order.id}</td>
-                  <td className="px-3 py-3 text-[11px]">{order.customer}</td>
-                  <td className="px-3 py-3 text-[11px] font-semibold">{order.total}</td>
+                  <td className="px-5 py-3 font-mono text-[13px] font-semibold">{order.id}</td>
+                  <td className="px-3 py-3 text-[13px]">{order.customer}</td>
+                  <td className="px-3 py-3 text-[13px] font-semibold">{order.total}</td>
                   <td className="px-3 py-3">
-                    <span className={`rounded-full px-2 py-1 text-[9px] font-bold uppercase tracking-wider ${order.statusColor}`}>{order.status}</span>
+                    <span className={`rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${order.statusColor}`}>{order.status}</span>
                   </td>
-                  <td className="px-3 py-3 text-[11px] text-gray-400">{order.date}</td>
+                  <td className="px-3 py-3 text-[13px] text-gray-400">{order.date}</td>
                 </tr>
               ))}
             </tbody>
@@ -371,9 +373,9 @@ export default function DashboardContent() {
           <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
             <div>
               <h3 className="text-[13px] font-bold">Popular Products</h3>
-              <p className="mt-0.5 text-[10px] text-gray-400">Stock &amp; sales overview</p>
+              <p className="mt-0.5 text-xs text-gray-400">Stock &amp; sales overview</p>
             </div>
-            <a id="view-all-products" href="#" className="text-[11px] font-semibold hover:underline">View All &rarr;</a>
+            <a id="view-all-products" href="#" className="text-[13px] font-semibold hover:underline">View All &rarr;</a>
           </div>
           <div className="divide-y divide-gray-50">
             {popularProducts.map((product) => (
@@ -382,10 +384,10 @@ export default function DashboardContent() {
                   <Image src={product.image} alt={product.name} width={40} height={40} className="h-full w-full object-cover" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[11px] font-semibold">{product.name}</p>
-                  <p className="text-[10px] text-gray-400">{product.sold}</p>
+                  <p className="truncate text-[13px] font-semibold">{product.name}</p>
+                  <p className="text-xs text-gray-400">{product.sold}</p>
                 </div>
-                <span className={`flex-shrink-0 rounded-full px-2 py-1 text-[9px] font-bold uppercase tracking-wider ${product.statusColor}`}>{product.status}</span>
+                <span className={`flex-shrink-0 rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${product.statusColor}`}>{product.status}</span>
               </div>
             ))}
           </div>

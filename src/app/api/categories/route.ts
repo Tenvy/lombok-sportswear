@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/src/lib/prisma";
+import { withRole } from "@/src/lib/auth";
 
 export async function GET(request: NextRequest) {
   try {
@@ -68,3 +69,23 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export const POST = withRole(["ADMIN"], async (request) => {
+  try {
+    const { name, slug } = await request.json();
+
+    if (!name || !slug) {
+      return NextResponse.json({ error: "Missing name or slug" }, { status: 400 });
+    }
+
+    const category = await prisma.category.create({
+      data: { name, slug },
+    });
+
+    return NextResponse.json(category, { status: 201 });
+  } catch (error) {
+    console.error("Error creating category:", error);
+    return NextResponse.json({ error: "Failed to create category" }, { status: 500 });
+  }
+});
+

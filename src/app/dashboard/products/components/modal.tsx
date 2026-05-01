@@ -1,8 +1,8 @@
 "use client";
 
-import { memo, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, memo } from "react";
 import Image from "next/image";
-import { Upload, Plus, Trash2 } from "lucide-react";
+import { UploadSimple, Plus, Trash } from "@phosphor-icons/react";
 import {
   Dialog,
   DialogContent,
@@ -44,7 +44,7 @@ const CategorySection = memo(({ allCategories, selectedCategories, onToggle }: {
   onToggle: (cat: string) => void;
 }) => (
   <div>
-    <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
+    <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-gray-500">
       Categories
     </label>
     <div className="flex flex-wrap gap-2">
@@ -56,7 +56,7 @@ const CategorySection = memo(({ allCategories, selectedCategories, onToggle }: {
             onChange={() => onToggle(cat)}
             className="h-3.5 w-3.5 rounded accent-black"
           />
-          <span className="text-[12px] text-gray-600 transition-colors group-hover:text-black">
+          <span className="text-[13px] text-gray-600 transition-colors group-hover:text-black">
             {cat}
           </span>
         </label>
@@ -65,67 +65,6 @@ const CategorySection = memo(({ allCategories, selectedCategories, onToggle }: {
   </div>
 ));
 CategorySection.displayName = "CategorySection";
-
-const VariantSection = memo(({ variants, onChange, onAdd, onRemove }: any) => (
-  <div>
-    <div className="mb-3 flex items-center justify-between">
-      <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
-        Variants
-      </label>
-      <button onClick={onAdd} className="flex items-center gap-1 text-[11px] font-medium text-gray-400 transition-colors hover:text-black">
-        <Plus className="size-3" />
-        Add Variant
-      </button>
-    </div>
-    <div className="space-y-2">
-      {variants.map((variant: any, index: number) => (
-        <div key={index} className="flex items-center gap-3 rounded-md border border-gray-100 px-3 py-2">
-          <div className="flex-[1.2]">
-            <label className="block text-[10px] font-medium text-gray-400">Color</label>
-            <input
-              type="text"
-              value={variant.color}
-              onChange={(e) => onChange(index, "color", e.target.value)}
-              className="w-full rounded border border-gray-200 px-2 py-1 text-[12px] focus:border-gray-400 focus:outline-none"
-            />
-          </div>
-          <div className="w-24">
-            <label className="block text-[10px] font-medium text-gray-400">Hex</label>
-            <input
-              type="text"
-              value={variant.colorCode || ""}
-              onChange={(e) => onChange(index, "colorCode", e.target.value)}
-              placeholder="#000000"
-              className="w-full rounded border border-gray-200 px-2 py-1 text-[12px] focus:border-gray-400 focus:outline-none"
-            />
-          </div>
-          <div className="flex-1">
-            <label className="block text-[10px] font-medium text-gray-400">Size</label>
-            <input
-              type="text"
-              value={variant.size}
-              onChange={(e) => onChange(index, "size", e.target.value)}
-              className="w-full rounded border border-gray-200 px-2 py-1 text-[12px] focus:border-gray-400 focus:outline-none"
-            />
-          </div>
-          <div className="w-20">
-            <label className="block text-[10px] font-medium text-gray-400">Stock</label>
-            <input
-              type="number"
-              value={variant.stock}
-              onChange={(e) => onChange(index, "stock", e.target.value)}
-              className="w-full rounded border border-gray-200 px-2 py-1 text-center text-[12px] focus:border-gray-400 focus:outline-none"
-            />
-          </div>
-          <button onClick={() => onRemove(index)} className="mt-4 text-gray-300 transition-colors hover:text-red-500">
-            <Trash2 className="size-3.5" />
-          </button>
-        </div>
-      ))}
-    </div>
-  </div>
-));
-VariantSection.displayName = "VariantSection";
 
 export default function ProductEditModal({
   open,
@@ -177,10 +116,6 @@ export default function ProductEditModal({
   const [submitting, setSubmitting] = useState(false);
 
   const totalStock = variants.reduce((sum, v) => sum + (parseInt(v.stock, 10) || 0), 0);
-
-  useEffect(() => {
-    if (open) fetchCategories();
-  }, [open, fetchCategories]);
 
   const updateField = (field: keyof typeof formData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -290,10 +225,10 @@ export default function ProductEditModal({
         className="top-[5%] max-h-[90vh] -translate-y-0 sm:max-w-3xl overflow-y-auto rounded-lg p-0"
       >
         <DialogHeader className="border-b border-gray-200 px-6 py-4">
-          <DialogTitle className="text-[14px] font-bold tracking-tight">
+          <DialogTitle className="text-base font-bold tracking-tight">
             {isEdit ? "Edit Product" : "Create Product"}
           </DialogTitle>
-          <DialogDescription className="mt-0.5 text-[11px] text-gray-400">
+          <DialogDescription className="mt-0.5 text-[13px] text-gray-400">
             {isEdit ? "Update product information, variants, and pricing." : "Add a new product to your catalog."}
           </DialogDescription>
         </DialogHeader>
@@ -301,19 +236,19 @@ export default function ProductEditModal({
         <div className="grid grid-cols-1 gap-6 p-6 lg:grid-cols-3">
           <div className="space-y-5 lg:col-span-2">
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
+              <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-gray-500">
                 Product Name
               </label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => updateField("name", e.target.value)}
-                className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
+                className="h-9 w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
+              <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-gray-500">
                 SKU
               </label>
               <input
@@ -321,7 +256,7 @@ export default function ProductEditModal({
                 value={formData.sku}
                 onChange={(e) => updateField("sku", e.target.value)}
                 placeholder="product-slug"
-                className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
+                className="h-9 w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
               />
             </div>
 
@@ -333,7 +268,7 @@ export default function ProductEditModal({
 
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
+                <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-gray-500">
                   Price (Rp)
                 </label>
                 <input
@@ -342,28 +277,28 @@ export default function ProductEditModal({
                   step={1}
                   value={formData.price}
                   onChange={(e) => updateField("price", e.target.value)}
-                  className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
+                  className="h-9 w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
+                <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-gray-500">
                   Total Stock
                 </label>
                 <input
                   type="number"
                   value={totalStock}
                   readOnly
-                  className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-[13px] text-gray-500 focus:outline-none"
+                  className="h-9 w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-[13px] text-gray-500 focus:outline-none"
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
+                <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-gray-500">
                   Status
                 </label>
                 <select
                   value={formData.status}
                   onChange={(e) => updateField("status", e.target.value)}
-                  className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
+                  className="h-9 w-full rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
                 >
                   <option>Published</option>
                   <option>Draft</option>
@@ -372,7 +307,7 @@ export default function ProductEditModal({
             </div>
 
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
+              <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-gray-500">
                 Description
               </label>
               <textarea
@@ -380,21 +315,14 @@ export default function ProductEditModal({
                 value={formData.description}
                 onChange={(e) => updateField("description", e.target.value)}
                 placeholder="Product description..."
-                className="w-full resize-none rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
+                className="min-h-[72px] w-full resize-none rounded-md border border-gray-200 px-3 py-2.5 text-[13px] transition-colors focus:border-gray-400 focus:outline-none"
               />
             </div>
-
-            <VariantSection
-              variants={variants}
-              onChange={updateVariant}
-              onAdd={addVariant}
-              onRemove={removeVariant}
-            />
           </div>
 
           <div className="space-y-5">
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
+              <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-gray-500">
                 Product Image
               </label>
               <div className="group relative aspect-square overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
@@ -408,12 +336,12 @@ export default function ProductEditModal({
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-gray-300">
-                    <Upload className="size-8" />
+                    <UploadSimple size={32} />
                   </div>
                 )}
                 <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition-opacity group-hover:opacity-100">
-                  <label className="flex cursor-pointer items-center gap-1.5 rounded-md bg-white px-3 py-2 text-[11px] font-semibold">
-                    <Upload className="size-3" />
+                  <label className="flex cursor-pointer items-center gap-1.5 rounded-md bg-white px-3 py-2 text-[13px] font-semibold">
+                    <UploadSimple size={14} />
                     {imageUrl ? "Change" : "Upload"}
                     <input
                       type="file"
@@ -426,12 +354,12 @@ export default function ProductEditModal({
                 </div>
               </div>
               {uploading && (
-                <p className="mt-1 text-[10px] text-gray-400">Uploading...</p>
+                <p className="mt-1 text-xs text-gray-400">Uploading...</p>
               )}
             </div>
 
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-500">
+              <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-gray-500">
                 Gallery Images
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -448,12 +376,12 @@ export default function ProductEditModal({
                       onClick={() => removeGalleryImage(index)}
                       className="absolute right-1 top-1 rounded bg-black/50 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
                     >
-                      <Trash2 className="size-3" />
+                      <Trash size={12} />
                     </button>
                   </div>
                 ))}
                 <label className="flex aspect-square cursor-pointer items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50 text-gray-300 transition-colors hover:border-gray-400 hover:text-gray-400">
-                  <Plus className="size-5" />
+                  <Plus size={20} />
                   <input
                     type="file"
                     multiple
@@ -465,45 +393,128 @@ export default function ProductEditModal({
                 </label>
               </div>
               {uploading && (
-                <p className="mt-1 text-[10px] text-gray-400">Uploading...</p>
+                <p className="mt-1 text-xs text-gray-400">Uploading...</p>
               )}
-              <p className="mt-2 text-[10px] text-gray-400">
+              <p className="mt-2 text-xs text-gray-400">
                 Upload additional product images.
               </p>
             </div>
+          </div>
+        </div>
 
-            <div className="rounded-md border border-gray-100 bg-gray-50/50 p-3">
-              <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-400">
-                Summary
-              </p>
-              <div className="space-y-1.5">
-                {isEdit && (
-                  <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-gray-400">Product ID</span>
-                    <span className="font-mono text-[10px] text-gray-500">{product.id}</span>
-                  </div>
-                )}
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-gray-400">Status</span>
-                  <span className={`font-semibold ${formData.status === "Published" ? "text-emerald-600" : "text-gray-500"}`}>
-                    {formData.status}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-gray-400">Total Stock</span>
-                  <span className="font-semibold">{totalStock}</span>
-                </div>
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-gray-400">Variants</span>
-                  <span className="font-semibold">{variants.length}</span>
-                </div>
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-gray-400">Price</span>
-                  <span className="font-semibold">Rp {formData.price}</span>
-                </div>
+        {/* Variants — full width section */}
+        <div className="border-t border-gray-200 px-6 py-5">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <label className="text-[13px] font-semibold uppercase tracking-[0.1em] text-gray-500">
+                Variants
+              </label>
+              <p className="mt-0.5 text-xs text-gray-400">{variants.length} variant{variants.length !== 1 ? "s" : ""} &middot; Total stock: {totalStock}</p>
+            </div>
+            <button onClick={addVariant} className="flex items-center gap-1 cursor-pointer rounded-lg bg-black px-3 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-gray-800">
+              <Plus size={14} weight="bold" />
+              Add Variant
+            </button>
+          </div>
+
+          {variants.length > 0 ? (
+            <div className="overflow-hidden rounded-lg border border-gray-200">
+              <div className="grid grid-cols-[1fr_80px_48px_1fr_80px_32px] gap-2 border-b border-gray-100 bg-gray-50 px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                <span>Color</span>
+                <span>Size</span>
+                <span>Pick</span>
+                <span>Hex Code</span>
+                <span>Stock</span>
+                <span />
+              </div>
+              <div className="divide-y divide-gray-50">
+                {variants.map((variant: any, index: number) => {
+                  const hexVal = variant.colorCode?.startsWith("#") ? variant.colorCode.slice(1) : variant.colorCode || "";
+                  return (
+                    <div key={index} className="grid grid-cols-[1fr_80px_48px_1fr_80px_32px] gap-2 items-center px-3 py-2.5">
+                      <input
+                        type="text"
+                        value={variant.color}
+                        onChange={(e) => {
+                          const next = [...variants];
+                          next[index] = { ...next[index], color: e.target.value };
+                          setVariants(next);
+                        }}
+                        placeholder="Black"
+                        className="h-9 rounded-md border border-gray-200 px-2.5 text-[13px] focus:border-gray-400 focus:outline-none"
+                      />
+                      <input
+                        type="text"
+                        value={variant.size}
+                        onChange={(e) => {
+                          const next = [...variants];
+                          next[index] = { ...next[index], size: e.target.value };
+                          setVariants(next);
+                        }}
+                        placeholder="L"
+                        className="h-9 rounded-md border border-gray-200 px-2.5 text-[13px] focus:border-gray-400 focus:outline-none"
+                      />
+                      <input
+                        type="color"
+                        value={variant.colorCode || "#000000"}
+                        onChange={(e) => {
+                          const next = [...variants];
+                          next[index] = { ...next[index], colorCode: e.target.value };
+                          setVariants(next);
+                        }}
+                        className="h-9 w-full cursor-pointer rounded-md border border-gray-200 p-1"
+                      />
+                      <div className="flex items-center gap-0">
+                        <span className="flex h-9 items-center rounded-l-md border border-r-0 border-gray-200 bg-gray-50 px-2 text-[13px] font-medium text-gray-400">
+                          #
+                        </span>
+                        <input
+                          type="text"
+                          value={hexVal}
+                          maxLength={6}
+                          onChange={(e) => {
+                            const raw = e.target.value.replace(/[^0-9a-fA-F]/g, "").slice(0, 6);
+                            const next = [...variants];
+                            next[index] = { ...next[index], colorCode: raw ? `#${raw}` : "" };
+                            setVariants(next);
+                          }}
+                          placeholder="000000"
+                          className="h-9 w-full rounded-r-md border border-gray-200 px-2.5 text-[13px] font-mono focus:border-gray-400 focus:outline-none"
+                        />
+                      </div>
+                      <input
+                        type="number"
+                        min={0}
+                        value={variant.stock}
+                        onChange={(e) => {
+                          const next = [...variants];
+                          next[index] = { ...next[index], stock: e.target.value };
+                          setVariants(next);
+                        }}
+                        className="h-9 rounded-md border border-gray-200 px-2 text-center text-[13px] font-semibold focus:border-gray-400 focus:outline-none"
+                      />
+                      <button
+                        onClick={() => removeVariant(index)}
+                        className="flex h-9 w-8 cursor-pointer items-center justify-center rounded-md text-gray-300 transition-colors hover:bg-red-50 hover:text-red-500"
+                      >
+                        <Trash size={14} />
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="rounded-lg border border-dashed border-gray-300 py-8 text-center">
+              <p className="text-[13px] text-gray-400">No variants yet.</p>
+              <button
+                onClick={addVariant}
+                className="mt-2 text-[13px] font-semibold text-black hover:underline"
+              >
+                Add first variant
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center justify-end gap-2 border-t border-gray-200 px-6 py-4">
