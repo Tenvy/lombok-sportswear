@@ -2,16 +2,17 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { 
-  Trash2, 
-  Minus, 
-  Plus, 
-  CreditCard, 
+import {
+  Trash2,
+  Minus,
+  Plus,
+  CreditCard,
   Banknote,
   Receipt,
   ShoppingCart,
   Loader2
 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -76,11 +77,11 @@ export default function CartSidebar({
           window.open(data.invoiceUrl, "_blank");
           onCheckout(); // Open the success modal locally as well
         } else {
-          alert("Gagal membuat invoice Xendit: " + (data.error || "Terjadi kesalahan"));
+          toast.error("Gagal membuat invoice Xendit: " + (data.error || "Terjadi kesalahan"));
         }
       } catch (err) {
         console.error(err);
-        alert("Terjadi kesalahan koneksi ke Xendit");
+        toast.error("Terjadi kesalahan koneksi ke Xendit");
       } finally {
         setIsProcessing(false);
       }

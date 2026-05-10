@@ -88,7 +88,7 @@ function ProductCard({
       >
         {product.name}
       </p>
-      <p className="mb-1 text-xs text-gray-400">SKU: {product.sku}</p>
+      <p className="mb-1 text-xs text-gray-400">Slug: {product.sku}</p>
       <div className="mb-2 flex flex-wrap items-center gap-1">
         {(product.categories ?? []).map((cat) => (
           <span
@@ -374,7 +374,7 @@ export default function ProductsTable({
                       {product.name}
                     </a>
                     <p className="mt-0.5 text-xs text-gray-400">
-                      SKU: {product.sku}
+                      Slug: {product.sku}
                     </p>
                   </td>
                   <td className="px-4 py-3">

@@ -81,7 +81,7 @@ export default function Navbar() {
             {status === "loading" ? (
               <div className="size-[18px] animate-pulse rounded-full bg-gray-200" />
             ) : session?.user ? (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-5">
                 <Link
                   href="/profile"
                   className="flex items-center gap-2 transition-colors hover:text-gray-400"
@@ -97,9 +97,9 @@ export default function Navbar() {
                   ) : (
                     <User className="size-[18px]" />
                   )}
-                  <span className="hidden text-[11px] font-medium md:block">
+                  {/* <span className="hidden text-[11px] font-medium md:block">
                     {session.user.name || "Account"}
-                  </span>
+                  </span> */}
                 </Link>
                 <button
                   onClick={handleSignOut}

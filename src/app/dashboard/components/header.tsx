@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { CaretRight, SignOut } from "@phosphor-icons/react";
+import { signOut } from "next-auth/react";
 
 const routeLabels: Record<string, string> = {
   dashboard: "Dashboard",
@@ -17,6 +18,9 @@ const routeLabels: Record<string, string> = {
 
 export default function DashboardHeader() {
   const pathname = usePathname();
+  const handleSignOut = () => {
+    signOut({ callbackUrl: "/dashboard/login" });
+  }
 
   const segments = pathname.split("/").filter(Boolean);
   const breadcrumbs = segments.map((segment, index) => ({
@@ -46,7 +50,7 @@ export default function DashboardHeader() {
             <p className="text-[13px] font-semibold leading-tight">Admin Utama</p>
             <p className="text-xs text-gray-400">Super Admin</p>
           </div>
-          <SignOut size={16} className="text-gray-400" />
+          <SignOut size={16} className="text-red-400 cursor-pointer" onClick={handleSignOut} />
         </div>
       </div>
     </header>

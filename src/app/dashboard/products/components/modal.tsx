@@ -249,7 +249,7 @@ export default function ProductEditModal({
 
             <div>
               <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-gray-500">
-                SKU
+                Slug
               </label>
               <input
                 type="text"

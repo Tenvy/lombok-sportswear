@@ -3,25 +3,30 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Trash2, Minus, Plus, ArrowRight, Tag, ChevronRight, ShoppingBag } from "lucide-react";
+import { toast } from "sonner";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Navbar from "@/src/components/Navbar";
 import Footer from "@/src/components/Footer";
 import Link from "next/link";
 import { useCart } from "@/src/app/context/CartContext";
 
 export default function CartPage() {
-  const { cart, updateQuantity, removeFromCart, subtotal } = useCart();
+  const { cart, updateQuantity, removeFromCart, subtotal, ready } = useCart();
+  const { data: session } = useSession();
+  const router = useRouter();
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
 
-  const shipping = subtotal > 1000000 ? 0 : 25000;
+  const shipping = subtotal > 1000000 ? 0 : 0;
   const total = subtotal + shipping - discount;
 
   const applyPromo = () => {
     if (promoCode.toUpperCase() === "WELCOME10") {
       setDiscount(subtotal * 0.1);
-      alert("Promo applied: 10% discount!");
+      toast.success("Promo applied: 10% discount!");
     } else {
-      alert("Invalid promo code");
+      toast.error("Invalid promo code");
     }
   };
 
@@ -42,11 +47,29 @@ export default function CartPage() {
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
           {/* Cart Items */}
           <div className="lg:col-span-8">
-            {cart.length === 0 ? (
+            {!ready ? (
+              <div className="space-y-10">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="flex gap-6 border-b border-gray-50 pb-10 animate-pulse">
+                    <div className="aspect-[4/5] w-32 flex-shrink-0 bg-gray-100 rounded-sm" />
+                    <div className="flex flex-1 flex-col justify-between py-1">
+                      <div className="space-y-2">
+                        <div className="h-3 w-2/3 bg-gray-100" />
+                        <div className="h-2.5 w-1/4 bg-gray-100" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="h-10 w-28 bg-gray-100" />
+                        <div className="size-4 bg-gray-100" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : cart.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-gray-300">
                 <ShoppingBag className="size-16 opacity-10" />
                 <p className="mt-4 text-xs font-bold uppercase tracking-widest">Keranjang Anda kosong</p>
-                <Link href="/" className="mt-8 text-[10px] font-bold uppercase tracking-widest text-black underline underline-offset-4">Mulai Belanja</Link>
+                <Link href="/products" className="mt-8 text-[10px] font-bold uppercase tracking-widest text-black underline underline-offset-4">Mulai Belanja</Link>
               </div>
             ) : (
               <div className="space-y-10">
@@ -69,7 +92,7 @@ export default function CartPage() {
                               <Tag className="size-2.5" /> {item.customization.serviceName} (+ Rp {item.customization.servicePrice.toLocaleString("id-ID")})
                             </p>
                           )}
-                          <p className="mt-1 text-[11px] text-gray-500">{item.size}</p>
+                          <p className="mt-1 text-[11px] text-gray-500">{item.size}{item.color ? ` / ${item.color}` : ""}</p>
                         </div>
                         <p className="text-xs font-bold">Rp {(item.price + (item.customization?.servicePrice || 0)).toLocaleString("id-ID")}</p>
                       </div>
@@ -114,10 +137,10 @@ export default function CartPage() {
                   <span className="text-gray-500">Subtotal</span>
                   <span>Rp {subtotal.toLocaleString("id-ID")}</span>
                 </div>
-                <div className="flex justify-between text-xs font-medium">
+                {/* <div className="flex justify-between text-xs font-medium">
                   <span className="text-gray-500">Shipping</span>
                   <span>{shipping === 0 ? "FREE" : `Rp ${shipping.toLocaleString("id-ID")}`}</span>
-                </div>
+                </div> */}
                 {discount > 0 && (
                   <div className="flex justify-between text-xs font-medium text-green-600">
                     <span>Discount</span>
@@ -152,23 +175,52 @@ export default function CartPage() {
                     Apply
                   </button>
                 </div>
-                <p className="text-[9px] text-gray-400">Try "WELCOME10" for 10% off</p>
               </div>
 
-              <Link href="/checkout" className="flex w-full items-center justify-center gap-2 bg-black py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-white hover:bg-gray-800">
+              <button
+                onClick={async () => {
+                  if (!session?.user) {
+                    router.push("/login");
+                    return;
+                  }
+                  try {
+                    const res = await fetch("/api/cart/validate-stock", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        items: cart.map((item) => ({
+                          productId: item.productId,
+                          name: item.name,
+                          size: item.size,
+                          color: item.color,
+                          quantity: item.quantity,
+                        })),
+                      }),
+                    });
+                    if (!res.ok) {
+                      const data = await res.json().catch(() => ({}));
+                      if (data.issues && data.issues.length > 0) {
+                        const names = data.issues.map(
+                          (i: any) =>
+                            `${i.name} (${i.size}${i.color ? ` / ${i.color}` : ""}) — stok tersedia: ${i.available}, diminta: ${i.requested}`
+                        );
+                        toast.error(
+                          `Stok tidak mencukupi:\n${names.join("\n")}`
+                        );
+                        return;
+                      }
+                      toast.error(data.error || "Gagal memvalidasi stok");
+                      return;
+                    }
+                    router.push("/checkout");
+                  } catch {
+                    toast.error("Terjadi kesalahan saat memeriksa stok");
+                  }
+                }}
+                className="flex w-full items-center justify-center gap-2 bg-black py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-white hover:bg-gray-800"
+              >
                 Checkout <ArrowRight className="size-4" />
-              </Link>
-              
-              <div className="space-y-4 pt-4">
-                <div className="flex items-center gap-3 text-[10px] text-gray-400">
-                  <div className="h-1 w-1 rounded-full bg-gray-300" />
-                  <span>Secure payment via Nicepay</span>
-                </div>
-                <div className="flex items-center gap-3 text-[10px] text-gray-400">
-                  <div className="h-1 w-1 rounded-full bg-gray-300" />
-                  <span>Free shipping on orders over Rp 1.000.000</span>
-                </div>
-              </div>
+              </button>
             </div>
           </div>
         </div>

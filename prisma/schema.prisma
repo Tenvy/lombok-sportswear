@@ -28,6 +28,7 @@ model User {
   updatedAt DateTime @updatedAt
   orders    Order[]
   addresses Address[]
+  carts     Cart[]
 }
 
 model Category {
@@ -62,6 +63,7 @@ model Product {
   orderItems  OrderItem[]
   productCategories ProductCategory[]
   variants    Variant[]
+  cartItems   CartItem[]
 }
 
 model Variant {
@@ -92,12 +94,12 @@ model Address {
 }
 
 model Order {
-  id          String      @id @default(cuid())
+  id          String          @id @default(cuid())
   userId      String?
-  user        User?       @relation(fields: [userId], references: [id])
-  status      OrderStatus @default(PENDING)
+  user        User?           @relation(fields: [userId], references: [id])
+  status      OrderStatus     @default(PENDING)
   subtotal    Int
-  shipping    Int         @default(0)
+  shipping    Int             @default(0)
   total       Int
   fullName    String
   phone       String
@@ -106,10 +108,11 @@ model Order {
   province    String
   postalCode  String
   promoCodeId String?
-  promoCode   PromoCode?  @relation(fields: [promoCodeId], references: [id])
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  promoCode   PromoCode?      @relation(fields: [promoCodeId], references: [id])
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
   items       OrderItem[]
+  payments    OrderPayment[]
 }
 
 model OrderItem {
@@ -122,8 +125,39 @@ model OrderItem {
   price       Int
   quantity    Int
   size        String
+  color       String?
   image       String
   createdAt   DateTime @default(now())
+}
+
+model OrderPayment {
+  id             String   @id @default(cuid())
+  orderId        String
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  method         String
+  providerRef    String?
+  providerResponse Json?
+  status         String   @default("PENDING")
+  expirationDate DateTime?
+  amount         Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([providerRef])
+  @@index([status, expirationDate])
+}
+
+model XenditLog {
+  id        String   @id @default(cuid())
+  orderId   String?
+  event     String
+  request   Json?
+  response  Json?
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+  @@index([createdAt])
 }
 
 model PromoCode {
@@ -141,6 +175,51 @@ model PromoCode {
 enum ProductStatus {
   PUBLISHED
   DRAFT
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String?
+  user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([userId])
+}
+
+model CartItem {
+  id                 String   @id @default(cuid())
+  cartId             String
+  cart               Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId          String
+  product            Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name               String
+  price              Int
+  quantity           Int
+  size               String
+  color              String?
+  image              String
+  customizationName  String?
+  customizationPrice Int?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([cartId])
+  @@index([productId])
+}
+
+model CustomizationService {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  price       Int
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([active, sortOrder])
 }
 
 enum OrderStatus {

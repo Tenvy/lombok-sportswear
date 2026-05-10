@@ -111,10 +111,10 @@ export default function ProductDisplay() {
     <section id="men" className="mt-6">
       <div className="">
         <Image
-          src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1800&h=1000&fit=crop&q=80"
+          src="https://www.atalon.id/cdn/shop/files/Copy_of_Banner_Elevate_Your_performance_1.jpg?v=1721897771&width=4000"
           alt="images"
-          width={1800}
-          height={1000}
+          width={4000}
+          height={4000}
         />
       </div>
 

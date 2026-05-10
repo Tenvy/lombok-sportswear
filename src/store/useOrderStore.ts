@@ -7,6 +7,7 @@ interface OrderItem {
   price: number;
   quantity: number;
   size: string;
+  color?: string;
   image: string;
 }
 
@@ -42,7 +43,7 @@ interface UseOrderStore {
   promoValidation: PromoValidation | null;
   loading: boolean;
   error: string | null;
-  fetchOrders: (userId: string) => Promise<void>;
+  fetchOrders: () => Promise<void>;
   createOrder: (orderData: Record<string, unknown>) => Promise<Order | null>;
   validatePromo: (code: string) => Promise<PromoValidation | null>;
   resetPromo: () => void;
@@ -55,10 +56,10 @@ export const useOrderStore = create<UseOrderStore>()((set) => ({
   loading: false,
   error: null,
 
-  fetchOrders: async (userId: string) => {
+  fetchOrders: async () => {
     set({ loading: true, error: null });
     try {
-      const response = await fetch(`/api/orders?userId=${userId}`);
+      const response = await fetch(`/api/orders`);
       if (!response.ok) throw new Error("Failed to fetch orders");
       const data = await response.json();
       set({ orders: data, loading: false });

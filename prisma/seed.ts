@@ -30,6 +30,21 @@ async function main() {
     },
   });
 
+  const customizationServices = [
+    { name: "PRINT DTF A3", price: 45000, sortOrder: 1 },
+    { name: "PRINT DTF A4", price: 25000, sortOrder: 2 },
+    { name: "SABLON POLYFLEX", price: 35000, sortOrder: 3 },
+    { name: "BORDIR LOGO", price: 15000, sortOrder: 4 },
+  ];
+
+  for (const service of customizationServices) {
+    await prisma.customizationService.upsert({
+      where: { name: service.name },
+      update: { price: service.price, sortOrder: service.sortOrder },
+      create: service,
+    });
+  }
+
 }
 
 main()

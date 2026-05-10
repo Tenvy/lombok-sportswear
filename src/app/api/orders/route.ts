@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/src/lib/prisma";
+import { getServerAuthSession } from "@/src/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerAuthSession();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Unauthorized: Please log in" },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const {
-      userId,
       items,
       fullName,
       phone,
@@ -23,14 +31,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Calculate totals
     const subtotal = items.reduce(
-      (sum: number, item: any) =>
+      (sum: number, item: { price: number; customization?: { servicePrice?: number }; quantity: number }) =>
         sum + (item.price + (item.customization?.servicePrice || 0)) * item.quantity,
       0
     );
 
-    // Validate promo code
     let promo = null;
     let discount = 0;
     if (promoCode) {
@@ -62,13 +68,12 @@ export async function POST(request: NextRequest) {
       discount = Math.round(subtotal * (promo.discount / 100));
     }
 
-    const shipping = 0; // Implement shipping calculation later
+    const shipping = 0;
     const total = subtotal - discount + shipping;
 
-    // Create order
     const order = await prisma.order.create({
       data: {
-        userId,
+        userId: session.user.id,
         fullName,
         phone,
         address,
@@ -81,12 +86,13 @@ export async function POST(request: NextRequest) {
         total,
         status: "PENDING",
         items: {
-          create: items.map((item: any) => ({
+          create: items.map((item: { id: string; name: string; price: number; quantity: number; size: string; color?: string; image: string }) => ({
             productId: item.id,
             name: item.name,
             price: item.price,
             quantity: item.quantity,
             size: item.size,
+            color: item.color,
             image: item.image,
           })),
         },
@@ -97,7 +103,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Update promo code usage
     if (promo) {
       await prisma.promoCode.update({
         where: { id: promo.id },
@@ -115,20 +120,18 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
-
-    if (!userId) {
+    const session = await getServerAuthSession();
+    if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "User ID is required" },
-        { status: 400 }
+        { error: "Unauthorized: Please log in" },
+        { status: 401 }
       );
     }
 
     const orders = await prisma.order.findMany({
-      where: { userId },
+      where: { userId: session.user.id },
       include: {
         items: true,
         promoCode: true,

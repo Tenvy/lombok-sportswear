@@ -2,79 +2,110 @@
 
 import { useParams } from "next/navigation";
 import Image from "next/image";
-import { useState, useEffect } from "react";
-import { Heart, Share2, ChevronRight, Minus, Plus, ShoppingBag, Star } from "lucide-react";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { Share2, ChevronRight, Minus, Plus, ShoppingBag, Star } from "lucide-react";
+import { toast } from "sonner";
 import Navbar from "@/src/components/Navbar";
 import Footer from "@/src/components/Footer";
 import { useCart } from "@/src/app/context/CartContext";
 import { useProductStore } from "@/src/store/useProductStore";
+import { useCustomizationServiceStore, type CustomizationService } from "@/src/store/useCustomizationServiceStore";
 import Link from "next/link";
-
-interface Product {
-  id: string;
-  slug: string;
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  images: string[];
-  soldOut: boolean;
-  sizes: string[];
-  categories: Array<{
-    id: string;
-    name: string;
-    slug: string;
-  }>;
-}
-
-const customServices = [
-  { name: "PRINT DTF A3", price: 45000 },
-  { name: "PRINT DTF A4", price: 25000 },
-  { name: "SABLON POLYFLEX", price: 35000 },
-  { name: "BORDIR LOGO", price: 15000 },
-];
-
-const colors = [
-  { name: "HITAM", hex: "#000000" },
-  { name: "NAVY", hex: "#1D293F" },
-  { name: "GREY", hex: "#7E8691" },
-  { name: "WHITE", hex: "#FFFFFF" },
-];
 
 export default function ProductPage() {
   const params = useParams();
   const productSlug = params.slug as string;
   const { product, loading, fetchProduct } = useProductStore();
+  const { services: customServices, fetchServices } = useCustomizationServiceStore();
   const [selectedSize, setSelectedSize] = useState<string>("");
-  const [selectedColor, setSelectedColor] = useState(colors[0].name);
+  const [selectedColor, setSelectedColor] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
-  const [selectedService, setSelectedService] = useState<{ name: string; price: number } | null>(null);
+  const [selectedService, setSelectedService] = useState<CustomizationService | null>(null);
   const [descExpanded, setDescExpanded] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { addToCart } = useCart();
+  const descRef = useRef<HTMLDivElement>(null);
+  const [needsExpand, setNeedsExpand] = useState(false);
 
   useEffect(() => {
     fetchProduct(productSlug);
   }, [productSlug, fetchProduct]);
 
-  const effectiveSize = selectedSize || product?.sizes?.[0] || "";
+  useEffect(() => {
+    fetchServices();
+  }, [fetchServices]);
 
-  const handleAddToCart = () => {
+  const colors = useMemo(() => {
+    if (!product) return [] as Array<{ name: string; hex: string }>;
+    const seen = new Set<string>();
+    const result: Array<{ name: string; hex: string }> = [];
+    for (const v of product.variants) {
+      if (!v.color) continue;
+      if (seen.has(v.color)) continue;
+      seen.add(v.color);
+      result.push({ name: v.color, hex: v.colorCode || "#000000" });
+    }
+    return result;
+  }, [product]);
+
+  useEffect(() => {
+    if (colors.length === 0) return;
+    if (!selectedColor || !colors.some((c) => c.name === selectedColor)) {
+      setSelectedColor(colors[0].name);
+    }
+  }, [colors, selectedColor]);
+
+  useEffect(() => {
+    if (!descRef.current) return;
+    setNeedsExpand(descRef.current.scrollHeight > descRef.current.clientHeight);
+  }, [product?.description]);
+
+  const isSizeAvailable = (size: string) => {
+    if (!product) return false;
+    if (!selectedColor) return product.variants.some((v) => v.size === size && v.stock > 0);
+    return product.variants.some(
+      (v) => v.color === selectedColor && v.size === size && v.stock > 0
+    );
+  };
+
+  const effectiveSize = useMemo(() => {
+    if (!product) return "";
+    if (selectedSize && isSizeAvailable(selectedSize)) return selectedSize;
+    return product.sizes.find((s) => isSizeAvailable(s)) || "";
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product, selectedSize, selectedColor]);
+
+  const handleAddToCart = async () => {
     if (!product || !effectiveSize) return;
 
-    addToCart({
-      id: `${product.slug}-${effectiveSize}-${selectedColor}-${selectedService?.name || "plain"}`,
-      name: product.name,
-      price: product.price,
-      quantity: quantity,
-      size: effectiveSize,
-      image: product.image,
-      customization: selectedService ? {
-        serviceName: selectedService.name,
-        servicePrice: selectedService.price
-      } : undefined
-    });
-    alert(`${product.name} ${selectedService ? `(+ ${selectedService.name}) ` : ""}ditambahkan ke keranjang!`);
+    try {
+      await addToCart({
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: quantity,
+        size: effectiveSize,
+        color: selectedColor || undefined,
+        image: product.image,
+        customization: selectedService ? {
+          serviceName: selectedService.name,
+          servicePrice: selectedService.price
+        } : undefined
+      });
+      toast.success(`${product.name} ${selectedService ? `(+ ${selectedService.name}) ` : ""}ditambahkan ke keranjang!`);
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
+  };
+
+  const handleShare = async () => {
+    if (typeof window === "undefined") return;
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success("Tautan disalin ke clipboard!");
+    } catch {
+      toast.error("Gagal menyalin tautan");
+    }
   };
 
   if (loading) {
@@ -218,49 +249,58 @@ export default function ProductPage() {
               </div>
 
               {/* Color Selection */}
-              <div className="space-y-4">
-                <p className="text-[10px] font-bold uppercase tracking-widest">WARNA — <span className="font-normal text-gray-500">{selectedColor}</span></p>
-                <div className="flex gap-3">
-                  {colors.map((color) => (
-                    <button
-                      key={color.name}
-                      onClick={() => setSelectedColor(color.name)}
-                      className={`size-10 rounded-full border-2 p-0.5 transition-all ${
-                        selectedColor === color.name ? "border-black" : "border-transparent"
-                      }`}
-                    >
-                      <div
-                        className="h-full w-full rounded-full border border-gray-100 shadow-inner"
-                        style={{ backgroundColor: color.hex }}
-                      />
-                    </button>
-                  ))}
+              {colors.length > 0 && (
+                <div className="space-y-4">
+                  <p className="text-[10px] font-bold uppercase tracking-widest">WARNA — <span className="font-normal text-gray-500">{selectedColor}</span></p>
+                  <div className="flex gap-3 flex-wrap">
+                    {colors.map((color) => (
+                      <button
+                        key={color.name}
+                        onClick={() => setSelectedColor(color.name)}
+                        title={color.name}
+                        className={`size-10 rounded-full border-2 p-0.5 transition-all ${
+                          selectedColor === color.name ? "border-black" : "border-transparent"
+                        }`}
+                      >
+                        <div
+                          className="h-full w-full rounded-full border border-gray-100 shadow-inner"
+                          style={{ backgroundColor: color.hex }}
+                        />
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Size Selection */}
-              <div className="space-y-4">
-                <div className="flex justify-between">
-                  <p className="text-[10px] font-bold uppercase tracking-widest">UKURAN</p>
-                  <button className="text-[10px] font-bold text-gray-400 underline decoration-gray-300 underline-offset-4 hover:text-black hover:decoration-black">Panduan Ukuran</button>
+              {product.sizes.length > 0 && (
+                <div className="space-y-4">
+                  <div className="flex justify-between">
+                    <p className="text-[10px] font-bold uppercase tracking-widest">UKURAN</p>
+                    <button className="text-[10px] font-bold text-gray-400 underline decoration-gray-300 underline-offset-4 hover:text-black hover:decoration-black">Panduan Ukuran</button>
+                  </div>
+                  <div className="grid grid-cols-6 gap-2">
+                    {product.sizes.map((size) => {
+                      const available = isSizeAvailable(size);
+                      const disabled = product.soldOut || !available;
+                      return (
+                        <button
+                          key={size}
+                          onClick={() => setSelectedSize(size)}
+                          disabled={disabled}
+                          className={`flex h-12 items-center justify-center border text-xs font-bold transition-all ${
+                            effectiveSize === size
+                              ? "border-black bg-black text-white"
+                              : "border-gray-200 text-gray-900 hover:border-black"
+                          } ${disabled ? "opacity-40 cursor-not-allowed line-through" : ""}`}
+                        >
+                          {size}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-                <div className="grid grid-cols-6 gap-2">
-                  {product.sizes.map((size) => (
-                    <button
-                      key={size}
-                      onClick={() => setSelectedSize(size)}
-                      disabled={product.soldOut}
-                      className={`flex h-12 items-center justify-center border text-xs font-bold transition-all ${
-                        effectiveSize === size
-                          ? "border-black bg-black text-white"
-                          : "border-gray-200 text-gray-900 hover:border-black"
-                      } ${product.soldOut ? "opacity-50 cursor-not-allowed" : ""}`}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              )}
 
               {/* Quantity & Action */}
               <div className="space-y-4 pt-4">
@@ -294,10 +334,11 @@ export default function ProductPage() {
                     <ShoppingBag className="size-4" />
                     {product.soldOut ? "SOLD OUT" : "TAMBAH KE KERANJANG"}
                   </button>
-                  <button className="flex flex-1 items-center justify-center border border-gray-200 h-14 hover:border-black transition-colors">
-                    <Heart className="size-5" />
-                  </button>
-                  <button className="flex flex-1 items-center justify-center border border-gray-200 h-14 hover:border-black transition-colors">
+                  <button
+                    onClick={handleShare}
+                    aria-label="Bagikan produk"
+                    className="flex flex-1 items-center justify-center border border-gray-200 h-14 hover:border-black transition-colors"
+                  >
                     <Share2 className="size-5" />
                   </button>
                  </div>
@@ -307,15 +348,18 @@ export default function ProductPage() {
 
               {/* Description */}
               <div className="mt-4">
-                <div className={`relative overflow-hidden transition-[max-height] duration-300 ${descExpanded ? "max-h-[9999px]" : "max-h-[344px]"}`}>
+                <div
+                  ref={descRef}
+                  className={`relative overflow-hidden transition-[max-height] duration-300 ${descExpanded ? "max-h-[9999px]" : "max-h-[344px]"}`}
+                >
                   <p className="whitespace-pre-line text-sm leading-relaxed text-gray-500">
                     {product.description}
                   </p>
-                  {!descExpanded && (
+                  {!descExpanded && needsExpand && (
                     <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-white to-transparent" />
                   )}
                 </div>
-                {!descExpanded && (
+                {!descExpanded && needsExpand && (
                   <button
                     onClick={() => setDescExpanded(true)}
                     className="mt-2 flex w-full items-center justify-center rounded border border-gray-200 bg-white px-4 py-2.5 text-xs font-semibold text-gray-600 transition-colors hover:border-black hover:text-black"

@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { ChevronRight, Check, Tag } from "lucide-react";
+import { toast } from "sonner";
 import Navbar from "@/src/components/Navbar";
 import Footer from "@/src/components/Footer";
 import Link from "next/link";
 import { useCart } from "@/src/app/context/CartContext";
 import { useOrderStore } from "@/src/store/useOrderStore";
+import { useSession } from "next-auth/react";
 
 interface CheckoutItem {
   id: string;
@@ -20,6 +22,7 @@ interface CheckoutItem {
 }
 
 export default function CheckoutPage() {
+  const { data: session, status: authStatus } = useSession();
   const { cart, subtotal, clearCart } = useCart();
   const [promoCode, setPromoCode] = useState("");
   const [promoValid, setPromoValid] = useState<boolean | null>(null);
@@ -68,17 +71,23 @@ export default function CheckoutPage() {
 
   const handleSubmitOrder = async () => {
     if (!validateForm()) return;
+    if (!session?.user?.id) {
+      toast.error("Silakan login terlebih dahulu");
+      return;
+    }
 
     const orderData = {
       items: cart.map((item) => ({
-        id: item.id,
+        id: item.productId,
         name: item.name,
         price: item.price,
         quantity: item.quantity,
         size: item.size,
+        color: item.color,
         image: item.image,
         customization: item.customization,
       })),
+      userId: session.user.id,
       ...formData,
       promoCode: promoValid ? promoCode : undefined,
     };
@@ -87,10 +96,10 @@ export default function CheckoutPage() {
 
     if (order) {
       clearCart();
-      alert(`Order berhasil dibuat! Order ID: ${order.id}`);
-      window.location.href = "/";
+      toast.success(`Order berhasil dibuat! Order ID: ${order.id}`);
+      window.location.href = `/checkout/pay?orderId=${order.id}`;
     } else {
-      alert("Terjadi kesalahan saat membuat order");
+      toast.error("Terjadi kesalahan saat membuat order");
     }
   };
 
@@ -110,6 +119,25 @@ export default function CheckoutPage() {
             className="inline-block bg-black px-8 py-3 text-xs font-bold uppercase tracking-widest text-white hover:bg-gray-800 transition-all"
           >
             Lihat Produk
+          </Link>
+        </div>
+        <Footer />
+      </main>
+    );
+  }
+
+  if (authStatus === "unauthenticated") {
+    return (
+      <main className="min-h-screen bg-white font-sans text-black">
+        <Navbar />
+        <div className="mx-auto max-w-[1400px] px-4 py-20 lg:px-8 text-center">
+          <h1 className="text-2xl font-bold mb-4">Login Diperlukan</h1>
+          <p className="text-gray-500 mb-8">Silakan login untuk melanjutkan checkout</p>
+          <Link
+            href="/login"
+            className="inline-block bg-black px-8 py-3 text-xs font-bold uppercase tracking-widest text-white hover:bg-gray-800 transition-all"
+          >
+            Login
           </Link>
         </div>
         <Footer />
@@ -267,7 +295,7 @@ export default function CheckoutPage() {
                     <div className="flex flex-1 flex-col justify-center">
                       <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">PRODUCT</p>
                       <h4 className="mt-1 text-[11px] font-bold uppercase leading-tight">{item.name}</h4>
-                      <p className="mt-1 text-[10px] text-gray-400">Size: {item.size} · Qty: {item.quantity}</p>
+                      <p className="mt-1 text-[10px] text-gray-400">Size: {item.size}{item.color ? ` / ${item.color}` : ""} · Qty: {item.quantity}</p>
                       <p className="mt-1 text-[11px] font-bold">Rp {item.price.toLocaleString("id-ID")}</p>
                     </div>
                   </div>
