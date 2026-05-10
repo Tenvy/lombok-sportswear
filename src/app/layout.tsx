@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "LOMBOK — Sportswear",
+  title: "4miliseconds - Engineered Sportswear for the Modern Athlete",
   description:
     "Engineered sportswear for the modern athlete. Minimal design, maximum performance.",
 };
